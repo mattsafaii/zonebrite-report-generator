@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
 </head>
 <body>
@@ -916,7 +915,7 @@
             }
         }
 
-        // Create PDF HTML Template with Tailwind styling
+        // Create PDF HTML Template with vanilla CSS styling
         function createPDFTemplate(data) {
             const reportPeriod = data.reportMonth ? new Date(data.reportMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A';
 
@@ -925,31 +924,31 @@
 
             // Get status badge class
             const getStatusClass = (status) => {
-                const statusClasses = {
-                    'Excellent': 'bg-green-600 text-white',
-                    'Good': 'bg-blue-500 text-white',
-                    'Operational': 'bg-green-600 text-white',
-                    'Stable': 'bg-blue-500 text-white',
-                    'Active': 'bg-green-600 text-white',
-                    'Needs Attention': 'bg-orange-500 text-white',
-                    'Intermittent': 'bg-orange-500 text-white',
-                    'Critical': 'bg-red-600 text-white',
-                    'Offline': 'bg-red-600 text-white',
-                    'Issues Detected': 'bg-red-600 text-white',
-                    'Failed': 'bg-red-600 text-white',
-                    'Not Configured': 'bg-gray-500 text-white'
+                const statusMap = {
+                    'Excellent': 'pdf-badge-excellent',
+                    'Good': 'pdf-badge-good',
+                    'Operational': 'pdf-badge-operational',
+                    'Stable': 'pdf-badge-stable',
+                    'Active': 'pdf-badge-active',
+                    'Needs Attention': 'pdf-badge-needs-attention',
+                    'Intermittent': 'pdf-badge-intermittent',
+                    'Critical': 'pdf-badge-critical',
+                    'Offline': 'pdf-badge-offline',
+                    'Issues Detected': 'pdf-badge-issues-detected',
+                    'Failed': 'pdf-badge-failed',
+                    'Not Configured': 'pdf-badge-not-configured'
                 };
-                return statusClasses[status] || 'bg-gray-400 text-white';
+                return 'pdf-badge ' + (statusMap[status] || '');
             };
 
             const getSeverityClass = (severity) => {
-                const severityClasses = {
-                    'Critical': 'bg-red-600 text-white',
-                    'High': 'bg-orange-500 text-white',
-                    'Medium': 'bg-yellow-500 text-gray-900',
-                    'Low': 'bg-blue-500 text-white'
+                const severityMap = {
+                    'Critical': 'pdf-badge-severity-critical',
+                    'High': 'pdf-badge-severity-high',
+                    'Medium': 'pdf-badge-severity-medium',
+                    'Low': 'pdf-badge-severity-low'
                 };
-                return severityClasses[severity] || 'bg-gray-400 text-white';
+                return 'pdf-badge ' + (severityMap[severity] || '');
             };
 
             // Build cameras HTML
@@ -965,20 +964,20 @@
                     const notes = data[`camera_${i}_notes`];
 
                     camerasHTML += `
-                        <div class="mb-4 p-4 border-2 border-blue-900 rounded-lg bg-gray-50 break-inside-avoid">
-                            <div class="flex items-center justify-between mb-3">
-                                <h4 class="text-base font-bold text-blue-900">📷 Camera #${i}: ${location}</h4>
-                                ${status ? `<span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(status)}">${status}</span>` : ''}
+                        <div class="pdf-camera-item">
+                            <div class="pdf-camera-header">
+                                <h4 class="pdf-camera-title">📷 Camera #${i}: ${location}</h4>
+                                ${status ? `<span class="${getStatusClass(status)}">${status}</span>` : ''}
                             </div>
-                            ${issues ? `<div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Issues:</span> <span class="text-gray-800 text-sm">${issues}</span></div>` : ''}
-                            ${actions ? `<div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Actions:</span> <span class="text-gray-800 text-sm">${actions}</span></div>` : ''}
-                            ${notes ? `<div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Notes:</span> <span class="text-gray-800 text-sm">${notes}</span></div>` : ''}
+                            ${issues ? `<div class="pdf-info-row"><span class="pdf-info-label">Issues:</span> <span class="pdf-info-value">${issues}</span></div>` : ''}
+                            ${actions ? `<div class="pdf-info-row"><span class="pdf-info-label">Actions:</span> <span class="pdf-info-value">${actions}</span></div>` : ''}
+                            ${notes ? `<div class="pdf-info-row"><span class="pdf-info-label">Notes:</span> <span class="pdf-info-value">${notes}</span></div>` : ''}
                         </div>
                     `;
                 }
             }
             if (!cameraFound) {
-                camerasHTML = '<p class="text-gray-500 italic text-sm ml-2">No camera details recorded</p>';
+                camerasHTML = '<p class="pdf-no-data">No camera details recorded</p>';
             }
 
             // Build issues HTML
@@ -993,50 +992,50 @@
                     const parts = data[`issue_${i}_parts`];
 
                     issuesHTML += `
-                        <div class="mb-4 p-4 border-2 border-orange-500 rounded-lg bg-orange-50 break-inside-avoid">
-                            <div class="flex items-center gap-3 mb-3">
-                                <h4 class="text-base font-bold text-red-600">⚠ Issue #${i}</h4>
-                                ${severity ? `<span class="px-3 py-1 rounded-full text-xs font-bold ${getSeverityClass(severity)}">${severity}</span>` : ''}
+                        <div class="pdf-issue-item">
+                            <div class="pdf-issue-header">
+                                <h4 class="pdf-issue-title">⚠ Issue #${i}</h4>
+                                ${severity ? `<span class="${getSeverityClass(severity)}">${severity}</span>` : ''}
                             </div>
-                            <div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Description:</span> <span class="text-gray-800 text-sm">${description}</span></div>
-                            ${resolution ? `<div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Resolution:</span> <span class="text-green-700 text-sm">${resolution}</span></div>` : ''}
-                            ${parts ? `<div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Parts:</span> <span class="text-gray-800 text-sm">${parts}</span></div>` : ''}
+                            <div class="pdf-info-row"><span class="pdf-info-label">Description:</span> <span class="pdf-info-value">${description}</span></div>
+                            ${resolution ? `<div class="pdf-info-row"><span class="pdf-info-label">Resolution:</span> <span class="pdf-issue-resolution">${resolution}</span></div>` : ''}
+                            ${parts ? `<div class="pdf-info-row"><span class="pdf-info-label">Parts:</span> <span class="pdf-info-value">${parts}</span></div>` : ''}
                         </div>
                     `;
                 }
             }
             if (!issueFound) {
-                issuesHTML = '<p class="text-gray-500 italic text-sm ml-2">No issues recorded</p>';
+                issuesHTML = '<p class="pdf-no-data">No issues recorded</p>';
             }
 
             return `
-                <div style="font-family: 'Barlow', sans-serif; font-size: 11px; line-height: 1.6; color: #333;">
+                <div class="pdf-container">
                     <!-- Cover Page -->
-                    <div class="break-after-page">
-                        <div class="bg-gradient-to-b from-blue-900 via-blue-700 to-blue-500 text-white py-20 px-8 text-center">
-                            <h1 class="text-5xl font-bold tracking-wider mb-2">ZONEBRITE</h1>
-                            <h2 class="text-4xl font-bold tracking-wider mb-4">SOLUTIONS</h2>
-                            <p class="text-lg italic mb-6">Protecting What Matters Most</p>
-                            <div class="w-1/2 h-1 bg-white mx-auto"></div>
+                    <div class="pdf-cover-page">
+                        <div class="pdf-cover-header">
+                            <h1 class="pdf-cover-title">ZONEBRITE</h1>
+                            <h2 class="pdf-cover-subtitle">SOLUTIONS</h2>
+                            <p class="pdf-cover-tagline">Protecting What Matters Most</p>
+                            <div class="pdf-cover-divider"></div>
                         </div>
 
-                        <div class="mt-12 mx-8 p-6 border-2 border-blue-900 rounded-lg bg-white">
-                            <h3 class="text-2xl font-bold text-blue-900 text-center mb-2">MONTHLY MAINTENANCE</h3>
-                            <h3 class="text-xl font-bold text-blue-900 text-center">REPORT</h3>
+                        <div class="pdf-cover-info-box">
+                            <h3 class="pdf-cover-report-title">MONTHLY MAINTENANCE</h3>
+                            <h3 class="pdf-cover-report-subtitle">REPORT</h3>
                         </div>
 
-                        <div class="mt-8 mx-8 p-6 bg-gray-100 rounded-lg">
-                            <div class="mb-4">
-                                <p class="font-bold text-gray-700 text-sm mb-1">CLIENT:</p>
-                                <p class="text-gray-900 text-base">${data.clientName || 'N/A'}</p>
+                        <div class="pdf-cover-client-box">
+                            <div class="pdf-mb-4">
+                                <p class="pdf-cover-client-label">CLIENT:</p>
+                                <p class="pdf-cover-client-value">${data.clientName || 'N/A'}</p>
                             </div>
                             <div>
-                                <p class="font-bold text-gray-700 text-sm mb-1">REPORT PERIOD:</p>
-                                <p class="text-gray-900 text-base">${reportPeriod}</p>
+                                <p class="pdf-cover-client-label">REPORT PERIOD:</p>
+                                <p class="pdf-cover-client-value">${reportPeriod}</p>
                             </div>
                         </div>
 
-                        <div class="absolute bottom-8 left-0 right-0 text-center text-gray-600 text-xs">
+                        <div class="pdf-cover-footer">
                             <p>Generated on: ${new Date().toLocaleDateString()}</p>
                             <p>Zonebrite Solutions | Phone: Contact for details</p>
                             <p>Email: info@zonebrite.com | www.zonebrite.com</p>
@@ -1044,177 +1043,173 @@
                     </div>
 
                     <!-- Content Pages -->
-                    <div class="p-6">
+                    <div class="pdf-content">
                         <!-- Section 1: Report Information -->
-                        <div class="mb-6 break-inside-avoid">
-                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
-                                <h3 class="text-base font-bold">📋 REPORT INFORMATION</h3>
+                        <div class="pdf-section">
+                            <div class="pdf-section-header">
+                                <h3 class="pdf-section-title">📋 REPORT INFORMATION</h3>
                             </div>
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
-                                <p class="text-sm"><span class="font-semibold text-gray-700">Report Date:</span> ${data.reportDate || 'N/A'}</p>
-                                <p class="text-sm"><span class="font-semibold text-gray-700">Property Address:</span> ${data.propertyAddress || 'N/A'}</p>
-                                <p class="text-sm"><span class="font-semibold text-gray-700">Technician:</span> ${data.technicianName || 'N/A'}</p>
-                                <p class="text-sm"><span class="font-semibold text-gray-700">Service Date:</span> ${data.serviceDate || 'N/A'}</p>
-                                <p class="text-sm"><span class="font-semibold text-gray-700">Next Scheduled Maintenance:</span> ${data.nextMaintenance || 'N/A'}</p>
+                            <div class="pdf-info-box pdf-space-y-2">
+                                <p class="pdf-text-sm"><span class="pdf-info-label">Report Date:</span> ${data.reportDate || 'N/A'}</p>
+                                <p class="pdf-text-sm"><span class="pdf-info-label">Property Address:</span> ${data.propertyAddress || 'N/A'}</p>
+                                <p class="pdf-text-sm"><span class="pdf-info-label">Technician:</span> ${data.technicianName || 'N/A'}</p>
+                                <p class="pdf-text-sm"><span class="pdf-info-label">Service Date:</span> ${data.serviceDate || 'N/A'}</p>
+                                <p class="pdf-text-sm"><span class="pdf-info-label">Next Scheduled Maintenance:</span> ${data.nextMaintenance || 'N/A'}</p>
                             </div>
                         </div>
 
                         <!-- Section 2: System Health Overview -->
-                        <div class="mb-6 break-inside-avoid">
-                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
-                                <h3 class="text-base font-bold">📊 SYSTEM HEALTH OVERVIEW</h3>
+                        <div class="pdf-section">
+                            <div class="pdf-section-header">
+                                <h3 class="pdf-section-title">📊 SYSTEM HEALTH OVERVIEW</h3>
                             </div>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3">
-                                    <span class="font-semibold text-gray-700 text-sm">Overall System Status:</span>
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(data.systemStatus)}">${data.systemStatus || 'N/A'}</span>
+                            <div class="pdf-space-y-3">
+                                <div class="pdf-flex-center pdf-flex-gap">
+                                    <span class="pdf-info-label pdf-text-sm">Overall System Status:</span>
+                                    <span class="${getStatusClass(data.systemStatus)}">${data.systemStatus || 'N/A'}</span>
                                 </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="font-semibold text-gray-700 text-sm">Network Connectivity:</span>
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(data.networkStatus)}">${data.networkStatus || 'N/A'}</span>
-                                </div>
-
-                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2 mt-3">
-                                    <p class="text-sm"><span class="font-semibold text-gray-700">Total Cameras:</span> ${data.totalCameras || '0'}</p>
-                                    <p class="text-sm"><span class="font-semibold text-gray-700">Cameras Operational:</span> ${data.camerasOperational || '0'}</p>
-                                    <p class="text-sm"><span class="font-semibold text-gray-700">Cameras Requiring Attention:</span> ${data.camerasAttention || '0'}</p>
+                                <div class="pdf-flex-center pdf-flex-gap">
+                                    <span class="pdf-info-label pdf-text-sm">Network Connectivity:</span>
+                                    <span class="${getStatusClass(data.networkStatus)}">${data.networkStatus || 'N/A'}</span>
                                 </div>
 
-                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2 mt-3">
-                                    <p class="text-sm"><span class="font-semibold text-gray-700">System Uptime:</span> ${data.uptime || '0'}%</p>
-                                    <p class="text-sm"><span class="font-semibold text-gray-700">Recording Storage Used:</span> ${data.storageUsed || '0'}%</p>
-                                    <p class="text-sm"><span class="font-semibold text-gray-700">Storage Days Remaining:</span> ${data.storageDays || '0'} days</p>
+                                <div class="pdf-info-box pdf-space-y-2 pdf-mt-3">
+                                    <p class="pdf-text-sm"><span class="pdf-info-label">Total Cameras:</span> ${data.totalCameras || '0'}</p>
+                                    <p class="pdf-text-sm"><span class="pdf-info-label">Cameras Operational:</span> ${data.camerasOperational || '0'}</p>
+                                    <p class="pdf-text-sm"><span class="pdf-info-label">Cameras Requiring Attention:</span> ${data.camerasAttention || '0'}</p>
+                                </div>
+
+                                <div class="pdf-info-box pdf-space-y-2 pdf-mt-3">
+                                    <p class="pdf-text-sm"><span class="pdf-info-label">System Uptime:</span> ${data.uptime || '0'}%</p>
+                                    <p class="pdf-text-sm"><span class="pdf-info-label">Recording Storage Used:</span> ${data.storageUsed || '0'}%</p>
+                                    <p class="pdf-text-sm"><span class="pdf-info-label">Storage Days Remaining:</span> ${data.storageDays || '0'} days</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Section 3: Maintenance Activities -->
-                        <div class="mb-6 break-inside-avoid">
-                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
-                                <h3 class="text-base font-bold">✅ MAINTENANCE ACTIVITIES COMPLETED</h3>
+                        <div class="pdf-section">
+                            <div class="pdf-section-header">
+                                <h3 class="pdf-section-title">✅ MAINTENANCE ACTIVITIES COMPLETED</h3>
                             </div>
                             ${activities.length > 0 ? `
-                                <div class="grid grid-cols-2 gap-3">
+                                <div class="pdf-activities-grid">
                                     ${activities.map(activity => `
-                                        <div class="flex items-start gap-2">
-                                            <div class="flex-shrink-0 mt-1">
-                                                <div class="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
-                                                    <span class="text-white text-xs">✓</span>
-                                                </div>
-                                            </div>
-                                            <span class="text-gray-800 text-sm">${activity}</span>
+                                        <div class="pdf-activity-item">
+                                            <div class="pdf-activity-checkmark">✓</div>
+                                            <span class="pdf-activity-text">${activity}</span>
                                         </div>
                                     `).join('')}
                                 </div>
-                            ` : '<p class="text-gray-500 italic text-sm ml-2">No activities recorded</p>'}
+                            ` : '<p class="pdf-no-data">No activities recorded</p>'}
                         </div>
 
                         <!-- Section 4: Individual Camera Status -->
-                        <div class="mb-6">
-                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
-                                <h3 class="text-base font-bold">📹 INDIVIDUAL CAMERA STATUS</h3>
+                        <div class="pdf-section">
+                            <div class="pdf-section-header">
+                                <h3 class="pdf-section-title">📹 INDIVIDUAL CAMERA STATUS</h3>
                             </div>
                             ${camerasHTML}
                         </div>
 
                         <!-- Section 5: Issues Identified & Resolved -->
-                        <div class="mb-6">
-                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
-                                <h3 class="text-base font-bold">🔧 ISSUES IDENTIFIED & RESOLVED</h3>
+                        <div class="pdf-section">
+                            <div class="pdf-section-header">
+                                <h3 class="pdf-section-title">🔧 ISSUES IDENTIFIED & RESOLVED</h3>
                             </div>
                             ${issuesHTML}
                         </div>
 
                         <!-- Section 6: Recommendations -->
-                        <div class="mb-6 break-inside-avoid">
-                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
-                                <h3 class="text-base font-bold">💡 RECOMMENDATIONS</h3>
+                        <div class="pdf-section">
+                            <div class="pdf-section-header">
+                                <h3 class="pdf-section-title">💡 RECOMMENDATIONS</h3>
                             </div>
                             ${data.maintenanceRec || data.upgradeOpp || data.optimizationSug ? `
-                                <div class="space-y-3">
-                                    ${data.maintenanceRec ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">Maintenance Recommendations:</p><p class="text-gray-800 text-sm">${data.maintenanceRec}</p></div>` : ''}
-                                    ${data.upgradeOpp ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">Upgrade Opportunities:</p><p class="text-gray-800 text-sm">${data.upgradeOpp}</p></div>` : ''}
-                                    ${data.optimizationSug ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">System Optimization:</p><p class="text-gray-800 text-sm">${data.optimizationSug}</p></div>` : ''}
+                                <div class="pdf-space-y-3">
+                                    ${data.maintenanceRec ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">Maintenance Recommendations:</p><p class="pdf-text-dark pdf-text-sm">${data.maintenanceRec}</p></div>` : ''}
+                                    ${data.upgradeOpp ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">Upgrade Opportunities:</p><p class="pdf-text-dark pdf-text-sm">${data.upgradeOpp}</p></div>` : ''}
+                                    ${data.optimizationSug ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">System Optimization:</p><p class="pdf-text-dark pdf-text-sm">${data.optimizationSug}</p></div>` : ''}
                                     ${data.estimatedCost || data.priorityLevel ? `
-                                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2 mt-3">
-                                            ${data.estimatedCost ? `<p class="text-sm"><span class="font-semibold text-gray-700">Estimated Cost:</span> ${data.estimatedCost}</p>` : ''}
-                                            ${data.priorityLevel ? `<p class="text-sm"><span class="font-semibold text-gray-700">Priority Level:</span> ${data.priorityLevel}</p>` : ''}
+                                        <div class="pdf-info-box pdf-space-y-2 pdf-mt-3">
+                                            ${data.estimatedCost ? `<p class="pdf-text-sm"><span class="pdf-info-label">Estimated Cost:</span> ${data.estimatedCost}</p>` : ''}
+                                            ${data.priorityLevel ? `<p class="pdf-text-sm"><span class="pdf-info-label">Priority Level:</span> ${data.priorityLevel}</p>` : ''}
                                         </div>
                                     ` : ''}
                                 </div>
-                            ` : '<p class="text-gray-500 italic text-sm ml-2">No recommendations at this time</p>'}
+                            ` : '<p class="pdf-no-data">No recommendations at this time</p>'}
                         </div>
 
                         <!-- Section 7: Storage & Recording -->
-                        <div class="mb-6 break-inside-avoid">
-                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
-                                <h3 class="text-base font-bold">💾 STORAGE & RECORDING DETAILS</h3>
+                        <div class="pdf-section">
+                            <div class="pdf-section-header">
+                                <h3 class="pdf-section-title">💾 STORAGE & RECORDING DETAILS</h3>
                             </div>
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2 mb-3">
-                                <p class="text-sm"><span class="font-semibold text-gray-700">Total Storage Capacity:</span> ${data.storageCapacity || 'N/A'}</p>
-                                <p class="text-sm"><span class="font-semibold text-gray-700">Current Storage Used:</span> ${data.storageCurrentlyUsed || 'N/A'}</p>
-                                <p class="text-sm"><span class="font-semibold text-gray-700">Recording Retention Period:</span> ${data.retentionPeriod || '0'} days</p>
-                                <p class="text-sm"><span class="font-semibold text-gray-700">Video Quality Settings:</span> ${data.videoQuality || 'N/A'}</p>
+                            <div class="pdf-info-box pdf-space-y-2 pdf-mb-3">
+                                <p class="pdf-text-sm"><span class="pdf-info-label">Total Storage Capacity:</span> ${data.storageCapacity || 'N/A'}</p>
+                                <p class="pdf-text-sm"><span class="pdf-info-label">Current Storage Used:</span> ${data.storageCurrentlyUsed || 'N/A'}</p>
+                                <p class="pdf-text-sm"><span class="pdf-info-label">Recording Retention Period:</span> ${data.retentionPeriod || '0'} days</p>
+                                <p class="pdf-text-sm"><span class="pdf-info-label">Video Quality Settings:</span> ${data.videoQuality || 'N/A'}</p>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <span class="font-semibold text-gray-700 text-sm">Backup Status:</span>
-                                <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(data.backupStatus)}">${data.backupStatus || 'N/A'}</span>
+                            <div class="pdf-flex-center pdf-flex-gap">
+                                <span class="pdf-info-label pdf-text-sm">Backup Status:</span>
+                                <span class="${getStatusClass(data.backupStatus)}">${data.backupStatus || 'N/A'}</span>
                             </div>
                         </div>
 
                         <!-- Section 8: System Updates -->
-                        <div class="mb-6 break-inside-avoid">
-                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
-                                <h3 class="text-base font-bold">🔄 SYSTEM UPDATES</h3>
+                        <div class="pdf-section">
+                            <div class="pdf-section-header">
+                                <h3 class="pdf-section-title">🔄 SYSTEM UPDATES</h3>
                             </div>
                             ${data.firmwareVersion || data.softwareVersion || data.updatesApplied || data.updatesRecommended ? `
-                                <div class="space-y-3">
+                                <div class="pdf-space-y-3">
                                     ${data.firmwareVersion || data.softwareVersion ? `
-                                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
-                                            ${data.firmwareVersion ? `<p class="text-sm"><span class="font-semibold text-gray-700">Current Firmware Version:</span> ${data.firmwareVersion}</p>` : ''}
-                                            ${data.softwareVersion ? `<p class="text-sm"><span class="font-semibold text-gray-700">Current Software Version:</span> ${data.softwareVersion}</p>` : ''}
+                                        <div class="pdf-info-box pdf-space-y-2">
+                                            ${data.firmwareVersion ? `<p class="pdf-text-sm"><span class="pdf-info-label">Current Firmware Version:</span> ${data.firmwareVersion}</p>` : ''}
+                                            ${data.softwareVersion ? `<p class="pdf-text-sm"><span class="pdf-info-label">Current Software Version:</span> ${data.softwareVersion}</p>` : ''}
                                         </div>
                                     ` : ''}
-                                    ${data.updatesApplied ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">Updates Applied This Month:</p><p class="text-gray-800 text-sm">${data.updatesApplied}</p></div>` : ''}
-                                    ${data.updatesRecommended ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">Updates Recommended:</p><p class="text-gray-800 text-sm">${data.updatesRecommended}</p></div>` : ''}
+                                    ${data.updatesApplied ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">Updates Applied This Month:</p><p class="pdf-text-dark pdf-text-sm">${data.updatesApplied}</p></div>` : ''}
+                                    ${data.updatesRecommended ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">Updates Recommended:</p><p class="pdf-text-dark pdf-text-sm">${data.updatesRecommended}</p></div>` : ''}
                                 </div>
-                            ` : '<p class="text-gray-500 italic text-sm ml-2">No updates information available</p>'}
+                            ` : '<p class="pdf-no-data">No updates information available</p>'}
                         </div>
 
                         <!-- Section 9: Summary -->
-                        <div class="mb-6 break-inside-avoid">
-                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
-                                <h3 class="text-base font-bold">📝 SUMMARY</h3>
+                        <div class="pdf-section">
+                            <div class="pdf-section-header">
+                                <h3 class="pdf-section-title">📝 SUMMARY</h3>
                             </div>
-                            <div class="space-y-3">
+                            <div class="pdf-space-y-3">
                                 <div>
-                                    <p class="font-semibold text-gray-700 text-sm mb-1">Overall Assessment:</p>
-                                    <p class="text-gray-800 text-sm">${data.overallAssessment || 'N/A'}</p>
+                                    <p class="pdf-info-label pdf-text-sm pdf-mb-1">Overall Assessment:</p>
+                                    <p class="pdf-text-dark pdf-text-sm">${data.overallAssessment || 'N/A'}</p>
                                 </div>
                                 ${data.criticalItems ? `
-                                    <div class="p-4 bg-red-50 border-2 border-red-600 rounded-lg">
-                                        <p class="font-bold text-red-600 text-sm mb-2">⚠ CRITICAL ITEMS REQUIRING IMMEDIATE ATTENTION:</p>
-                                        <p class="text-gray-800 text-sm">${data.criticalItems}</p>
+                                    <div class="pdf-critical-box">
+                                        <p class="pdf-critical-title pdf-mb-2">⚠ CRITICAL ITEMS REQUIRING IMMEDIATE ATTENTION:</p>
+                                        <p class="pdf-text-dark pdf-text-sm">${data.criticalItems}</p>
                                     </div>
                                 ` : ''}
                                 ${data.focusAreas ? `
                                     <div>
-                                        <p class="font-semibold text-gray-700 text-sm mb-1">Next Month Focus Areas:</p>
-                                        <p class="text-gray-800 text-sm">${data.focusAreas}</p>
+                                        <p class="pdf-info-label pdf-text-sm pdf-mb-1">Next Month Focus Areas:</p>
+                                        <p class="pdf-text-dark pdf-text-sm">${data.focusAreas}</p>
                                     </div>
                                 ` : ''}
                             </div>
                         </div>
 
                         <!-- Section 10: Sign-off -->
-                        <div class="mb-6 break-inside-avoid">
-                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
-                                <h3 class="text-base font-bold">✍️ SIGN-OFF</h3>
+                        <div class="pdf-section">
+                            <div class="pdf-section-header">
+                                <h3 class="pdf-section-title">✍️ SIGN-OFF</h3>
                             </div>
-                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-900 space-y-3">
-                                <p class="text-sm"><span class="font-semibold text-gray-700">Technician Signature:</span> <span class="text-blue-900 font-medium">${data.techSignature || 'N/A'}</span></p>
-                                ${data.clientAck ? `<p class="text-sm"><span class="font-semibold text-gray-700">Client Acknowledgment:</span> ${data.clientAck}</p>` : ''}
-                                ${data.clientFeedback ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">Client Feedback:</p><p class="text-gray-800 text-sm">${data.clientFeedback}</p></div>` : ''}
+                            <div class="pdf-signoff-box pdf-space-y-3">
+                                <p class="pdf-text-sm"><span class="pdf-info-label">Technician Signature:</span> <span class="pdf-signoff-value">${data.techSignature || 'N/A'}</span></p>
+                                ${data.clientAck ? `<p class="pdf-text-sm"><span class="pdf-info-label">Client Acknowledgment:</span> ${data.clientAck}</p>` : ''}
+                                ${data.clientFeedback ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">Client Feedback:</p><p class="pdf-text-dark pdf-text-sm">${data.clientFeedback}</p></div>` : ''}
                             </div>
                         </div>
                     </div>
