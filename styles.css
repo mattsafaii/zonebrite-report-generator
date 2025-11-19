@@ -1,14 +1,30 @@
 :root {
-    --primary-blue: #2c5aa0;
-    --secondary-blue: #4a90e2;
+    /* Primary Colors */
+    --fence-green: #09332C;
+    --fiery-glow: #F0531C;
+
+    /* Secondary Colors */
+    --norfolk-green: #2E4B3C;
+    --pumpkin-vapor: #FFA74F;
+
+    /* Neutral Colors */
+    --venetian-lace: #F7EDDA;
+    --macadamia-beige: #F7DFBA;
+
+    /* Text Colors */
     --dark-gray: #333333;
-    --medium-gray: #666666;
-    --light-gray: #f5f5f5;
-    --border-gray: #dddddd;
+
+    /* Status Colors */
     --success-green: #28a745;
-    --warning-orange: #fd7e14;
     --danger-red: #dc3545;
-    --info-blue: #17a2b8;
+
+    /* Legacy mappings for easier updates */
+    --primary-color: var(--fence-green);
+    --secondary-color: var(--fiery-glow);
+    --tertiary-color: var(--norfolk-green);
+    --light-bg: var(--venetian-lace);
+    --card-bg: var(--macadamia-beige);
+    --border-gray: #dddddd;
 }
 
 * {
@@ -19,7 +35,7 @@
 
 body {
     font-family: 'Barlow', sans-serif;
-    background-color: var(--light-gray);
+    background-color: white;
     color: var(--dark-gray);
     line-height: 1.6;
     padding: 20px;
@@ -37,7 +53,7 @@ body {
 /* Header Styles */
 .header {
     text-align: center;
-    border-bottom: 3px solid var(--primary-blue);
+    border-bottom: 3px solid var(--fence-green);
     padding-bottom: 20px;
     margin-bottom: 30px;
 }
@@ -45,14 +61,14 @@ body {
 .logo {
     font-size: 36px;
     font-weight: 700;
-    color: var(--primary-blue);
+    color: var(--fence-green);
     letter-spacing: 2px;
     margin-bottom: 5px;
 }
 
 .tagline {
     font-size: 16px;
-    color: var(--medium-gray);
+    color: var(--norfolk-green);
     font-weight: 400;
     font-style: italic;
     margin-bottom: 15px;
@@ -70,7 +86,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--light-gray);
+    background-color: var(--venetian-lace);
     padding: 15px 20px;
     border-radius: 6px;
     margin-bottom: 30px;
@@ -80,7 +96,7 @@ body {
 
 .status-item {
     font-size: 14px;
-    color: var(--medium-gray);
+    color: var(--norfolk-green);
 }
 
 .status-item strong {
@@ -95,7 +111,7 @@ body {
 
 .progress-label {
     font-size: 12px;
-    color: var(--medium-gray);
+    color: var(--norfolk-green);
     margin-bottom: 5px;
 }
 
@@ -109,7 +125,7 @@ body {
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(90deg, var(--fiery-glow), var(--fence-green));
     width: 0%;
     transition: width 0.3s ease;
 }
@@ -117,14 +133,14 @@ body {
 /* Form Sections */
 .form-section {
     margin-bottom: 40px;
-    border-left: 4px solid var(--primary-blue);
+    border-left: 4px solid var(--fence-green);
     padding-left: 20px;
 }
 
 .section-title {
     font-size: 22px;
     font-weight: 600;
-    color: var(--primary-blue);
+    color: var(--fence-green);
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -132,7 +148,7 @@ body {
 }
 
 .section-number {
-    background-color: var(--primary-blue);
+    background-color: var(--fence-green);
     color: white;
     width: 32px;
     height: 32px;
@@ -178,7 +194,7 @@ label {
 
 .tooltip {
     font-size: 12px;
-    color: var(--medium-gray);
+    color: var(--norfolk-green);
     font-weight: 400;
     font-style: italic;
 }
@@ -203,8 +219,8 @@ input:focus,
 select:focus,
 textarea:focus {
     outline: none;
-    border-color: var(--secondary-blue);
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    border-color: var(--fiery-glow);
+    box-shadow: 0 0 0 3px rgba(240, 83, 28, 0.1);
 }
 
 input.error,
@@ -248,7 +264,7 @@ textarea.error + .error-message {
 }
 
 .checkbox-item:hover {
-    background-color: var(--light-gray);
+    background-color: var(--venetian-lace);
 }
 
 .checkbox-item input[type="checkbox"] {
@@ -275,21 +291,21 @@ input[type="range"] {
     flex: 1;
     height: 6px;
     border-radius: 3px;
-    background: linear-gradient(90deg, var(--success-green) 0%, var(--warning-orange) 70%, var(--danger-red) 100%);
+    background: linear-gradient(90deg, var(--success-green) 0%, var(--pumpkin-vapor) 70%, var(--danger-red) 100%);
     outline: none;
 }
 
 .range-value {
     font-size: 18px;
     font-weight: 600;
-    color: var(--primary-blue);
+    color: var(--fence-green);
     min-width: 50px;
     text-align: right;
 }
 
 /* Dynamic Sections */
 .dynamic-item {
-    background-color: var(--light-gray);
+    background-color: var(--macadamia-beige);
     padding: 20px;
     border-radius: 6px;
     margin-bottom: 15px;
@@ -305,7 +321,7 @@ input[type="range"] {
 
 .item-number {
     font-weight: 600;
-    color: var(--primary-blue);
+    color: var(--fence-green);
 }
 
 .remove-btn {
@@ -326,7 +342,7 @@ input[type="range"] {
 }
 
 .add-btn {
-    background-color: var(--secondary-blue);
+    background-color: var(--fiery-glow);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -343,7 +359,7 @@ input[type="range"] {
 }
 
 .add-btn:hover {
-    background-color: var(--primary-blue);
+    background-color: #d4461a;
 }
 
 .add-btn::before {
@@ -354,8 +370,8 @@ input[type="range"] {
 
 /* Status Indicators */
 .status-excellent { color: var(--success-green); }
-.status-good { color: var(--info-blue); }
-.status-attention { color: var(--warning-orange); }
+.status-good { color: var(--norfolk-green); }
+.status-attention { color: var(--pumpkin-vapor); }
 .status-critical { color: var(--danger-red); }
 
 /* Action Buttons */
@@ -383,24 +399,24 @@ input[type="range"] {
 }
 
 .btn-primary {
-    background-color: var(--primary-blue);
+    background-color: var(--fiery-glow);
     color: white;
-    box-shadow: 0 4px 6px rgba(44, 90, 160, 0.3);
+    box-shadow: 0 4px 6px rgba(240, 83, 28, 0.3);
 }
 
 .btn-primary:hover {
-    background-color: #234780;
-    box-shadow: 0 6px 12px rgba(44, 90, 160, 0.4);
+    background-color: #d4461a;
+    box-shadow: 0 6px 12px rgba(240, 83, 28, 0.4);
     transform: translateY(-2px);
 }
 
 .btn-secondary {
-    background-color: var(--medium-gray);
+    background-color: var(--norfolk-green);
     color: white;
 }
 
 .btn-secondary:hover {
-    background-color: var(--dark-gray);
+    background-color: var(--fence-green);
 }
 
 .btn-danger {
@@ -451,12 +467,12 @@ input[type="range"] {
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 15px;
-    color: var(--dark-gray);
+    color: var(--fence-green);
 }
 
 .modal-body {
     margin-bottom: 20px;
-    color: var(--medium-gray);
+    color: var(--dark-gray);
     line-height: 1.6;
 }
 
@@ -532,8 +548,8 @@ input[type="range"] {
 
 /* Loading spinner */
 .spinner {
-    border: 3px solid var(--light-gray);
-    border-top: 3px solid var(--primary-blue);
+    border: 3px solid var(--venetian-lace);
+    border-top: 3px solid var(--fiery-glow);
     border-radius: 50%;
     width: 20px;
     height: 20px;
@@ -561,7 +577,7 @@ input[type="range"] {
 }
 
 .pdf-cover-header {
-    background: linear-gradient(to bottom, #1e3a8a, #1e40af, #3b82f6);
+    background: linear-gradient(to bottom, var(--fence-green), var(--norfolk-green), var(--fiery-glow));
     color: white;
     padding: 80px 32px;
     text-align: center;
@@ -597,7 +613,7 @@ input[type="range"] {
 .pdf-cover-info-box {
     margin: 48px 32px 0;
     padding: 24px;
-    border: 2px solid #1e3a8a;
+    border: 2px solid var(--fence-green);
     border-radius: 8px;
     background-color: white;
 }
@@ -605,7 +621,7 @@ input[type="range"] {
 .pdf-cover-report-title {
     font-size: 24px;
     font-weight: 700;
-    color: #1e3a8a;
+    color: var(--fence-green);
     text-align: center;
     margin-bottom: 8px;
 }
@@ -613,20 +629,20 @@ input[type="range"] {
 .pdf-cover-report-subtitle {
     font-size: 20px;
     font-weight: 700;
-    color: #1e3a8a;
+    color: var(--fence-green);
     text-align: center;
 }
 
 .pdf-cover-client-box {
     margin: 32px;
     padding: 24px;
-    background-color: var(--light-gray);
+    background-color: var(--venetian-lace);
     border-radius: 8px;
 }
 
 .pdf-cover-client-label {
     font-weight: 700;
-    color: var(--medium-gray);
+    color: var(--norfolk-green);
     font-size: 13px;
     margin-bottom: 4px;
 }
@@ -642,7 +658,7 @@ input[type="range"] {
     left: 0;
     right: 0;
     text-align: center;
-    color: var(--medium-gray);
+    color: var(--norfolk-green);
     font-size: 11px;
 }
 
@@ -657,7 +673,7 @@ input[type="range"] {
 }
 
 .pdf-section-header {
-    background-color: #1e3a8a;
+    background-color: var(--fence-green);
     color: white;
     padding: 8px 16px;
     border-radius: 8px;
@@ -670,7 +686,7 @@ input[type="range"] {
 }
 
 .pdf-info-box {
-    background-color: var(--light-gray);
+    background-color: var(--venetian-lace);
     padding: 16px;
     border-radius: 8px;
     border: 1px solid var(--border-gray);
@@ -687,7 +703,7 @@ input[type="range"] {
 
 .pdf-info-label {
     font-weight: 600;
-    color: var(--medium-gray);
+    color: var(--norfolk-green);
     font-size: 13px;
 }
 
@@ -720,7 +736,7 @@ input[type="range"] {
 
 .pdf-badge-needs-attention,
 .pdf-badge-intermittent {
-    background-color: #f97316;
+    background-color: var(--pumpkin-vapor);
     color: white;
 }
 
@@ -743,7 +759,7 @@ input[type="range"] {
 }
 
 .pdf-badge-severity-high {
-    background-color: #f97316;
+    background-color: var(--pumpkin-vapor);
     color: white;
 }
 
@@ -793,9 +809,9 @@ input[type="range"] {
 .pdf-camera-item {
     margin-bottom: 16px;
     padding: 16px;
-    border: 2px solid #1e3a8a;
+    border: 2px solid var(--fence-green);
     border-radius: 8px;
-    background-color: var(--light-gray);
+    background-color: var(--venetian-lace);
     page-break-inside: avoid;
 }
 
@@ -809,14 +825,14 @@ input[type="range"] {
 .pdf-camera-title {
     font-size: 16px;
     font-weight: 700;
-    color: #1e3a8a;
+    color: var(--fence-green);
 }
 
 /* PDF Issue Item */
 .pdf-issue-item {
     margin-bottom: 16px;
     padding: 16px;
-    border: 2px solid #f97316;
+    border: 2px solid var(--pumpkin-vapor);
     border-radius: 8px;
     background-color: #fff7ed;
     page-break-inside: avoid;
@@ -874,7 +890,7 @@ input[type="range"] {
 
 /* PDF No Data */
 .pdf-no-data {
-    color: var(--medium-gray);
+    color: var(--norfolk-green);
     font-style: italic;
     font-size: 13px;
     margin-left: 8px;
@@ -897,20 +913,20 @@ input[type="range"] {
 
 /* PDF Sign-off Box */
 .pdf-signoff-box {
-    background-color: #eff6ff;
+    background-color: var(--venetian-lace);
     padding: 16px;
     border-radius: 8px;
-    border: 1px solid #1e3a8a;
+    border: 1px solid var(--fence-green);
 }
 
 .pdf-signoff-value {
-    color: #1e3a8a;
+    color: var(--fence-green);
     font-weight: 500;
 }
 
 /* PDF Utility Classes */
 .pdf-text-white { color: white; }
-.pdf-text-gray { color: var(--medium-gray); }
+.pdf-text-gray { color: var(--norfolk-green); }
 .pdf-text-dark { color: var(--dark-gray); }
 .pdf-text-sm { font-size: 13px; }
 .pdf-text-xs { font-size: 11px; }
