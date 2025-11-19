@@ -7,7 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
 
     <style>
         :root {
@@ -1421,676 +1422,7 @@
             btn.disabled = true;
 
             try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-
                 const formData = getFormData();
-                let yPos = 20;
-                const pageHeight = doc.internal.pageSize.height;
-                const margin = 20;
-                const maxWidth = 170;
-
-                // Helper function to add cover page
-                function addCoverPage() {
-                    // Background gradient effect (using rectangles)
-                    doc.setFillColor(44, 90, 160);
-                    doc.rect(0, 0, 210, 80, 'F');
-                    doc.setFillColor(74, 144, 226);
-                    doc.rect(0, 80, 210, 40, 'F');
-
-                    // Company name with modern styling
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(32);
-                    doc.setFont(undefined, 'bold');
-                    doc.text('ZONEBRITE', 105, 50, { align: 'center' });
-                    doc.setFontSize(28);
-                    doc.text('SOLUTIONS', 105, 62, { align: 'center' });
-
-                    // Tagline
-                    doc.setFontSize(11);
-                    doc.setFont(undefined, 'italic');
-                    doc.text('Protecting What Matters Most', 105, 73, { align: 'center' });
-
-                    // White accent line
-                    doc.setDrawColor(255, 255, 255);
-                    doc.setLineWidth(2);
-                    doc.line(60, 85, 150, 85);
-
-                    // Report title box
-                    doc.setFillColor(255, 255, 255);
-                    doc.roundedRect(30, 130, 150, 50, 3, 3, 'F');
-                    doc.setDrawColor(44, 90, 160);
-                    doc.setLineWidth(0.5);
-                    doc.roundedRect(30, 130, 150, 50, 3, 3, 'S');
-
-                    doc.setTextColor(44, 90, 160);
-                    doc.setFontSize(20);
-                    doc.setFont(undefined, 'bold');
-                    doc.text('MONTHLY MAINTENANCE', 105, 148, { align: 'center' });
-                    doc.setFontSize(18);
-                    doc.text('REPORT', 105, 160, { align: 'center' });
-
-                    // Client information box
-                    doc.setFillColor(245, 245, 245);
-                    doc.roundedRect(30, 200, 150, 40, 3, 3, 'F');
-
-                    doc.setTextColor(51, 51, 51);
-                    doc.setFontSize(12);
-                    doc.setFont(undefined, 'bold');
-                    doc.text('CLIENT:', 40, 212);
-                    doc.setFont(undefined, 'normal');
-                    doc.setFontSize(11);
-                    doc.text(formData.clientName || 'N/A', 40, 220);
-
-                    doc.setFont(undefined, 'bold');
-                    doc.setFontSize(12);
-                    doc.text('REPORT PERIOD:', 40, 232);
-                    doc.setFont(undefined, 'normal');
-                    doc.setFontSize(11);
-                    let reportPeriod = 'N/A';
-                    if (formData.reportMonth) {
-                        const date = new Date(formData.reportMonth + '-01');
-                        reportPeriod = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                    }
-                    doc.text(reportPeriod, 40, 240);
-
-                    // Bottom footer on cover
-                    doc.setFontSize(8);
-                    doc.setTextColor(102, 102, 102);
-                    doc.text('Generated on: ' + new Date().toLocaleDateString(), 105, 270, { align: 'center' });
-                    doc.text('Zonebrite Solutions | Phone: Contact for details', 105, 276, { align: 'center' });
-                    doc.text('Email: info@zonebrite.com | www.zonebrite.com', 105, 282, { align: 'center' });
-                }
-
-                // Helper function to add page header
-                function addHeader() {
-                    // Modern header with gradient bar
-                    doc.setFillColor(44, 90, 160);
-                    doc.rect(0, 0, 210, 12, 'F');
-
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(14);
-                    doc.setFont(undefined, 'bold');
-                    doc.text('ZONEBRITE SOLUTIONS', 20, 8);
-
-                    doc.setFontSize(8);
-                    doc.setFont(undefined, 'normal');
-                    doc.text('Monthly Maintenance Report', 165, 8);
-
-                    // Subtle separator line
-                    doc.setDrawColor(200, 200, 200);
-                    doc.setLineWidth(0.3);
-                    doc.line(margin, 15, 210 - margin, 15);
-                }
-
-                // Helper function to add page footer
-                function addFooter(pageNum) {
-                    const footerY = pageHeight - 15;
-
-                    // Footer separator line
-                    doc.setDrawColor(200, 200, 200);
-                    doc.setLineWidth(0.3);
-                    doc.line(margin, footerY - 3, 210 - margin, footerY - 3);
-
-                    // Page number in a subtle badge
-                    doc.setFillColor(245, 245, 245);
-                    doc.roundedRect(98, footerY, 14, 6, 1, 1, 'F');
-                    doc.setFontSize(8);
-                    doc.setTextColor(102, 102, 102);
-                    doc.setFont(undefined, 'bold');
-                    doc.text(`${pageNum}`, 105, footerY + 4, { align: 'center' });
-
-                    // Contact information
-                    doc.setFont(undefined, 'normal');
-                    doc.setFontSize(7);
-                    doc.setTextColor(120, 120, 120);
-                    doc.text('Phone: Contact for details', 40, footerY + 10);
-                    doc.text('Email: info@zonebrite.com', 95, footerY + 10);
-                    doc.text('www.zonebrite.com', 155, footerY + 10);
-                }
-
-                // Helper function to check if we need a new page
-                function checkNewPage(neededSpace) {
-                    if (yPos + neededSpace > pageHeight - 20) {
-                        addFooter(pageNum);
-                        doc.addPage();
-                        pageNum++;
-                        addHeader();
-                        yPos = 50;
-                        return true;
-                    }
-                    return false;
-                }
-
-                // Helper function to add section title
-                function addSectionTitle(title) {
-                    checkNewPage(20);
-
-                    // Modern section header with colored background
-                    doc.setFillColor(44, 90, 160);
-                    doc.roundedRect(margin - 2, yPos - 5, 210 - 2 * margin + 4, 10, 2, 2, 'F');
-
-                    doc.setFontSize(11);
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(255, 255, 255);
-                    doc.text(title, margin + 2, yPos + 1);
-
-                    yPos += 10;
-                }
-
-                // Helper function to add status badge
-                function addStatusBadge(status, x, y) {
-                    const colors = {
-                        'Excellent': { bg: [40, 167, 69], text: [255, 255, 255] },
-                        'Good': { bg: [23, 162, 184], text: [255, 255, 255] },
-                        'Operational': { bg: [40, 167, 69], text: [255, 255, 255] },
-                        'Stable': { bg: [23, 162, 184], text: [255, 255, 255] },
-                        'Needs Attention': { bg: [253, 126, 20], text: [255, 255, 255] },
-                        'Intermittent': { bg: [253, 126, 20], text: [255, 255, 255] },
-                        'Critical': { bg: [220, 53, 69], text: [255, 255, 255] },
-                        'Offline': { bg: [220, 53, 69], text: [255, 255, 255] },
-                        'Issues Detected': { bg: [220, 53, 69], text: [255, 255, 255] }
-                    };
-
-                    const color = colors[status] || { bg: [200, 200, 200], text: [51, 51, 51] };
-
-                    // Draw badge background
-                    doc.setFillColor(...color.bg);
-                    doc.roundedRect(x, y - 4, doc.getTextWidth(status) + 6, 6, 1, 1, 'F');
-
-                    // Draw text
-                    doc.setTextColor(...color.text);
-                    doc.setFontSize(8);
-                    doc.setFont(undefined, 'bold');
-                    doc.text(status, x + 3, y);
-                }
-
-                // Helper function to add field
-                function addField(label, value, color = [51, 51, 51], isStatus = false) {
-                    checkNewPage(10);
-                    doc.setFontSize(9);
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(85, 85, 85);
-                    doc.text(label + ':', margin, yPos);
-
-                    const labelWidth = doc.getTextWidth(label + ': ');
-
-                    if (isStatus && value && value !== 'N/A') {
-                        // Use status badge for status fields
-                        addStatusBadge(value, margin + labelWidth, yPos);
-                        yPos += 7;
-                    } else {
-                        doc.setFont(undefined, 'normal');
-                        doc.setTextColor(...color);
-
-                        const valueText = String(value || 'N/A');
-                        const lines = doc.splitTextToSize(valueText, maxWidth - labelWidth);
-                        doc.text(lines, margin + labelWidth, yPos);
-
-                        yPos += 6 * lines.length;
-                    }
-                }
-
-                // Helper function to add info box
-                function addInfoBox(data) {
-                    checkNewPage(25);
-
-                    // Draw rounded box
-                    doc.setFillColor(248, 249, 250);
-                    doc.setDrawColor(220, 220, 220);
-                    doc.setLineWidth(0.3);
-                    doc.roundedRect(margin, yPos, 170, data.length * 6 + 8, 2, 2, 'FD');
-
-                    yPos += 6;
-
-                    data.forEach(item => {
-                        doc.setFontSize(9);
-                        doc.setFont(undefined, 'bold');
-                        doc.setTextColor(85, 85, 85);
-                        doc.text(item.label + ':', margin + 4, yPos);
-
-                        doc.setFont(undefined, 'normal');
-                        doc.setTextColor(51, 51, 51);
-                        const labelWidth = doc.getTextWidth(item.label + ': ');
-                        doc.text(String(item.value || 'N/A'), margin + 4 + labelWidth, yPos);
-
-                        yPos += 6;
-                    });
-
-                    yPos += 4;
-                }
-
-                // Helper to get status color
-                function getStatusColor(status) {
-                    const colors = {
-                        'Excellent': [40, 167, 69],
-                        'Good': [23, 162, 184],
-                        'Operational': [40, 167, 69],
-                        'Stable': [23, 162, 184],
-                        'Needs Attention': [253, 126, 20],
-                        'Intermittent': [253, 126, 20],
-                        'Critical': [220, 53, 69],
-                        'Offline': [220, 53, 69],
-                        'Issues Detected': [220, 53, 69]
-                    };
-                    return colors[status] || [51, 51, 51];
-                }
-
-                let pageNum = 1;
-
-                // Add cover page
-                addCoverPage();
-
-                // Start content on new page
-                doc.addPage();
-                pageNum++;
-                addHeader();
-                yPos = 20;
-
-                // Section 1: Report Information
-                addSectionTitle('📋 REPORT INFORMATION');
-                yPos += 2;
-                addInfoBox([
-                    { label: 'Report Date', value: formData.reportDate },
-                    { label: 'Property Address', value: formData.propertyAddress },
-                    { label: 'Technician', value: formData.technicianName },
-                    { label: 'Service Date', value: formData.serviceDate },
-                    { label: 'Next Scheduled Maintenance', value: formData.nextMaintenance }
-                ]);
-                yPos += 3;
-
-                // Section 2: System Health Overview
-                addSectionTitle('📊 SYSTEM HEALTH OVERVIEW');
-                yPos += 2;
-                addField('Overall System Status', formData.systemStatus, getStatusColor(formData.systemStatus), true);
-                addField('Network Connectivity', formData.networkStatus, getStatusColor(formData.networkStatus), true);
-                yPos += 2;
-
-                // Camera stats in a box
-                addInfoBox([
-                    { label: 'Total Cameras', value: formData.totalCameras },
-                    { label: 'Cameras Operational', value: formData.camerasOperational },
-                    { label: 'Cameras Requiring Attention', value: formData.camerasAttention || '0' }
-                ]);
-
-                yPos += 2;
-                addInfoBox([
-                    { label: 'System Uptime', value: formData.uptime + '%' },
-                    { label: 'Recording Storage Used', value: formData.storageUsed + '%' },
-                    { label: 'Storage Days Remaining', value: formData.storageDays + ' days' }
-                ]);
-                yPos += 3;
-
-                // Section 3: Maintenance Activities
-                addSectionTitle('✅ MAINTENANCE ACTIVITIES COMPLETED');
-                yPos += 2;
-                const activities = formData.activities ? (Array.isArray(formData.activities) ? formData.activities : [formData.activities]) : [];
-                if (activities.length > 0) {
-                    // Split activities into columns for better layout
-                    const colWidth = 85;
-                    let col = 0;
-                    let startY = yPos;
-
-                    activities.forEach((activity, index) => {
-                        checkNewPage(6);
-
-                        const xPos = margin + (col * colWidth);
-
-                        // Checkmark icon (green circle with check)
-                        doc.setFillColor(40, 167, 69);
-                        doc.circle(xPos + 2, yPos - 1.5, 1.5, 'F');
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(7);
-                        doc.text('✓', xPos + 0.8, yPos + 0.3);
-
-                        // Activity text
-                        doc.setFontSize(8);
-                        doc.setFont(undefined, 'normal');
-                        doc.setTextColor(51, 51, 51);
-                        const activityText = doc.splitTextToSize(activity, colWidth - 8);
-                        doc.text(activityText, xPos + 6, yPos);
-
-                        // Move to next position
-                        col++;
-                        if (col >= 2) {
-                            col = 0;
-                            yPos += 6;
-                        }
-                    });
-
-                    // Adjust yPos if we ended in first column
-                    if (col === 1) {
-                        yPos += 6;
-                    }
-                } else {
-                    doc.setFontSize(9);
-                    doc.setTextColor(150, 150, 150);
-                    doc.setFont(undefined, 'italic');
-                    doc.text('No activities recorded', margin + 5, yPos);
-                    yPos += 5;
-                }
-                yPos += 5;
-
-                // Section 4: Individual Camera Status
-                addSectionTitle('📹 INDIVIDUAL CAMERA STATUS');
-                yPos += 2;
-                let cameraFound = false;
-                for (let i = 1; i <= formData.cameraCount; i++) {
-                    const location = formData[`camera_${i}_location`];
-                    if (location) {
-                        cameraFound = true;
-                        checkNewPage(30);
-
-                        // Camera card with border
-                        const cardHeight = 28;
-                        doc.setFillColor(252, 252, 253);
-                        doc.setDrawColor(44, 90, 160);
-                        doc.setLineWidth(0.5);
-                        doc.roundedRect(margin, yPos, 170, cardHeight, 2, 2, 'FD');
-
-                        yPos += 5;
-
-                        // Camera header with icon
-                        doc.setFillColor(44, 90, 160);
-                        doc.circle(margin + 4, yPos - 1.5, 2, 'F');
-                        doc.setTextColor(255, 255, 255);
-                        doc.setFontSize(8);
-                        doc.text('📷', margin + 2.8, yPos + 0.5);
-
-                        doc.setFontSize(10);
-                        doc.setFont(undefined, 'bold');
-                        doc.setTextColor(44, 90, 160);
-                        doc.text(`Camera #${i}: ${location}`, margin + 9, yPos);
-
-                        const status = formData[`camera_${i}_status`];
-                        if (status) {
-                            const statusWidth = doc.getTextWidth(`Camera #${i}: ${location}`) + 12;
-                            addStatusBadge(status, margin + statusWidth, yPos);
-                        }
-
-                        yPos += 7;
-
-                        // Camera details
-                        const issues = formData[`camera_${i}_issues`];
-                        const actions = formData[`camera_${i}_actions`];
-                        const notes = formData[`camera_${i}_notes`];
-
-                        if (issues) {
-                            doc.setFontSize(8);
-                            doc.setFont(undefined, 'bold');
-                            doc.setTextColor(100, 100, 100);
-                            doc.text('Issues:', margin + 4, yPos);
-                            doc.setFont(undefined, 'normal');
-                            doc.setTextColor(51, 51, 51);
-                            const issuesText = doc.splitTextToSize(issues, 155);
-                            doc.text(issuesText, margin + 18, yPos);
-                            yPos += 4 + (issuesText.length - 1) * 4;
-                        }
-
-                        if (actions) {
-                            doc.setFontSize(8);
-                            doc.setFont(undefined, 'bold');
-                            doc.setTextColor(100, 100, 100);
-                            doc.text('Actions:', margin + 4, yPos);
-                            doc.setFont(undefined, 'normal');
-                            doc.setTextColor(51, 51, 51);
-                            const actionsText = doc.splitTextToSize(actions, 155);
-                            doc.text(actionsText, margin + 18, yPos);
-                            yPos += 4 + (actionsText.length - 1) * 4;
-                        }
-
-                        if (notes) {
-                            doc.setFontSize(8);
-                            doc.setFont(undefined, 'bold');
-                            doc.setTextColor(100, 100, 100);
-                            doc.text('Notes:', margin + 4, yPos);
-                            doc.setFont(undefined, 'normal');
-                            doc.setTextColor(51, 51, 51);
-                            const notesText = doc.splitTextToSize(notes, 155);
-                            doc.text(notesText, margin + 18, yPos);
-                            yPos += 4 + (notesText.length - 1) * 4;
-                        }
-
-                        yPos += 5;
-                    }
-                }
-                if (!cameraFound) {
-                    doc.setFontSize(9);
-                    doc.setTextColor(150, 150, 150);
-                    doc.setFont(undefined, 'italic');
-                    doc.text('No camera details recorded', margin + 5, yPos);
-                    yPos += 5;
-                }
-                yPos += 3;
-
-                // Section 5: Issues Identified & Resolved
-                addSectionTitle('🔧 ISSUES IDENTIFIED & RESOLVED');
-                yPos += 2;
-                let issueFound = false;
-                for (let i = 1; i <= formData.issueCount; i++) {
-                    const description = formData[`issue_${i}_description`];
-                    if (description) {
-                        issueFound = true;
-                        checkNewPage(28);
-
-                        // Issue card
-                        const cardHeight = 26;
-                        doc.setFillColor(254, 252, 251);
-                        doc.setDrawColor(253, 126, 20);
-                        doc.setLineWidth(0.5);
-                        doc.roundedRect(margin, yPos, 170, cardHeight, 2, 2, 'FD');
-
-                        yPos += 5;
-
-                        // Issue header
-                        doc.setFontSize(10);
-                        doc.setFont(undefined, 'bold');
-                        doc.setTextColor(220, 53, 69);
-                        doc.text(`⚠ Issue #${i}`, margin + 4, yPos);
-
-                        const severity = formData[`issue_${i}_severity`];
-                        if (severity) {
-                            let severityBgColor = [200, 200, 200];
-                            if (severity === 'Critical') severityBgColor = [220, 53, 69];
-                            else if (severity === 'High') severityBgColor = [253, 126, 20];
-                            else if (severity === 'Medium') severityBgColor = [255, 193, 7];
-                            else if (severity === 'Low') severityBgColor = [23, 162, 184];
-
-                            // Severity badge
-                            doc.setFillColor(...severityBgColor);
-                            const badgeWidth = doc.getTextWidth(severity) + 6;
-                            doc.roundedRect(margin + 35, yPos - 4, badgeWidth, 6, 1, 1, 'F');
-                            doc.setTextColor(255, 255, 255);
-                            doc.setFontSize(8);
-                            doc.setFont(undefined, 'bold');
-                            doc.text(severity, margin + 38, yPos);
-                        }
-
-                        yPos += 7;
-
-                        // Description
-                        doc.setFontSize(8);
-                        doc.setFont(undefined, 'bold');
-                        doc.setTextColor(100, 100, 100);
-                        doc.text('Description:', margin + 4, yPos);
-                        doc.setFont(undefined, 'normal');
-                        doc.setTextColor(51, 51, 51);
-                        const descText = doc.splitTextToSize(description, 155);
-                        doc.text(descText, margin + 27, yPos);
-                        yPos += 4 + (descText.length - 1) * 4;
-
-                        const resolution = formData[`issue_${i}_resolution`];
-                        if (resolution) {
-                            doc.setFont(undefined, 'bold');
-                            doc.setTextColor(100, 100, 100);
-                            doc.text('Resolution:', margin + 4, yPos);
-                            doc.setFont(undefined, 'normal');
-                            doc.setTextColor(40, 167, 69);
-                            const resText = doc.splitTextToSize(resolution, 155);
-                            doc.text(resText, margin + 27, yPos);
-                            yPos += 4 + (resText.length - 1) * 4;
-                        }
-
-                        const parts = formData[`issue_${i}_parts`];
-                        if (parts) {
-                            doc.setFont(undefined, 'bold');
-                            doc.setTextColor(100, 100, 100);
-                            doc.text('Parts:', margin + 4, yPos);
-                            doc.setFont(undefined, 'normal');
-                            doc.setTextColor(51, 51, 51);
-                            doc.text(parts, margin + 27, yPos);
-                            yPos += 4;
-                        }
-
-                        yPos += 5;
-                    }
-                }
-                if (!issueFound) {
-                    doc.setFontSize(9);
-                    doc.setTextColor(150, 150, 150);
-                    doc.setFont(undefined, 'italic');
-                    doc.text('No issues recorded', margin + 5, yPos);
-                    yPos += 5;
-                }
-                yPos += 3;
-
-                // Section 6: Recommendations
-                addSectionTitle('💡 RECOMMENDATIONS');
-                yPos += 2;
-                if (formData.maintenanceRec || formData.upgradeOpp || formData.optimizationSug) {
-                    if (formData.maintenanceRec) {
-                        addField('Maintenance Recommendations', formData.maintenanceRec);
-                    }
-                    if (formData.upgradeOpp) {
-                        addField('Upgrade Opportunities', formData.upgradeOpp);
-                    }
-                    if (formData.optimizationSug) {
-                        addField('System Optimization', formData.optimizationSug);
-                    }
-                    if (formData.estimatedCost || formData.priorityLevel) {
-                        yPos += 2;
-                        const recData = [];
-                        if (formData.estimatedCost) recData.push({ label: 'Estimated Cost', value: formData.estimatedCost });
-                        if (formData.priorityLevel) recData.push({ label: 'Priority Level', value: formData.priorityLevel });
-                        addInfoBox(recData);
-                    }
-                } else {
-                    doc.setFontSize(9);
-                    doc.setTextColor(150, 150, 150);
-                    doc.setFont(undefined, 'italic');
-                    doc.text('No recommendations at this time', margin + 5, yPos);
-                    yPos += 5;
-                }
-                yPos += 3;
-
-                // Section 7: Storage & Recording
-                addSectionTitle('💾 STORAGE & RECORDING DETAILS');
-                yPos += 2;
-                addInfoBox([
-                    { label: 'Total Storage Capacity', value: formData.storageCapacity },
-                    { label: 'Current Storage Used', value: formData.storageCurrentlyUsed },
-                    { label: 'Recording Retention Period', value: formData.retentionPeriod + ' days' },
-                    { label: 'Video Quality Settings', value: formData.videoQuality }
-                ]);
-                addField('Backup Status', formData.backupStatus, getStatusColor(formData.backupStatus), true);
-                yPos += 3;
-
-                // Section 8: System Updates
-                addSectionTitle('🔄 SYSTEM UPDATES');
-                yPos += 2;
-                if (formData.firmwareVersion || formData.softwareVersion || formData.updatesApplied || formData.updatesRecommended) {
-                    if (formData.firmwareVersion || formData.softwareVersion) {
-                        const versionData = [];
-                        if (formData.firmwareVersion) versionData.push({ label: 'Current Firmware Version', value: formData.firmwareVersion });
-                        if (formData.softwareVersion) versionData.push({ label: 'Current Software Version', value: formData.softwareVersion });
-                        addInfoBox(versionData);
-                    }
-                    if (formData.updatesApplied) {
-                        addField('Updates Applied This Month', formData.updatesApplied);
-                    }
-                    if (formData.updatesRecommended) {
-                        addField('Updates Recommended', formData.updatesRecommended);
-                    }
-                } else {
-                    doc.setFontSize(9);
-                    doc.setTextColor(150, 150, 150);
-                    doc.setFont(undefined, 'italic');
-                    doc.text('No updates information available', margin + 5, yPos);
-                    yPos += 5;
-                }
-                yPos += 3;
-
-                // Section 9: Summary
-                addSectionTitle('📝 SUMMARY');
-                yPos += 2;
-                addField('Overall Assessment', formData.overallAssessment);
-                if (formData.criticalItems) {
-                    yPos += 2;
-                    // Critical items box
-                    doc.setFillColor(254, 242, 242);
-                    doc.setDrawColor(220, 53, 69);
-                    doc.setLineWidth(0.5);
-                    const criticalText = doc.splitTextToSize(formData.criticalItems, 160);
-                    const boxHeight = 8 + criticalText.length * 5;
-                    doc.roundedRect(margin, yPos, 170, boxHeight, 2, 2, 'FD');
-
-                    doc.setFontSize(9);
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(220, 53, 69);
-                    doc.text('⚠ CRITICAL ITEMS REQUIRING IMMEDIATE ATTENTION:', margin + 4, yPos + 5);
-
-                    doc.setFont(undefined, 'normal');
-                    doc.setTextColor(51, 51, 51);
-                    doc.text(criticalText, margin + 4, yPos + 10);
-                    yPos += boxHeight + 3;
-                }
-                if (formData.focusAreas) {
-                    addField('Next Month Focus Areas', formData.focusAreas);
-                }
-                yPos += 3;
-
-                // Section 10: Sign-off
-                addSectionTitle('✍️ SIGN-OFF');
-                yPos += 2;
-
-                // Signature box
-                doc.setFillColor(245, 250, 255);
-                doc.setDrawColor(44, 90, 160);
-                doc.setLineWidth(0.3);
-                doc.roundedRect(margin, yPos, 170, 25, 2, 2, 'FD');
-
-                yPos += 5;
-                doc.setFontSize(9);
-                doc.setFont(undefined, 'bold');
-                doc.setTextColor(85, 85, 85);
-                doc.text('Technician Signature:', margin + 4, yPos);
-                doc.setFont(undefined, 'normal');
-                doc.setTextColor(44, 90, 160);
-                doc.text(formData.techSignature || 'N/A', margin + 45, yPos);
-
-                yPos += 6;
-                if (formData.clientAck) {
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(85, 85, 85);
-                    doc.text('Client Acknowledgment:', margin + 4, yPos);
-                    doc.setFont(undefined, 'normal');
-                    doc.setTextColor(51, 51, 51);
-                    doc.text(formData.clientAck, margin + 45, yPos);
-                    yPos += 6;
-                }
-
-                if (formData.clientFeedback) {
-                    doc.setFont(undefined, 'bold');
-                    doc.setTextColor(85, 85, 85);
-                    doc.text('Client Feedback:', margin + 4, yPos);
-                    doc.setFont(undefined, 'normal');
-                    doc.setTextColor(51, 51, 51);
-                    const feedbackText = doc.splitTextToSize(formData.clientFeedback, 155);
-                    doc.text(feedbackText, margin + 4, yPos + 5);
-                }
-
-                // Add footer to last page
-                addFooter(pageNum);
 
                 // Generate filename
                 const clientNameClean = (formData.clientName || 'Client').replace(/[^a-zA-Z0-9]/g, '');
@@ -2101,20 +1433,343 @@
                 }
                 const filename = `${clientNameClean}_MaintenanceReport_${monthYear}.pdf`;
 
-                // Save PDF
-                doc.save(filename);
+                // Create HTML content for PDF
+                const pdfContent = createPDFTemplate(formData);
 
-                // Reset button
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                // Configure html2pdf options
+                const opt = {
+                    margin: [10, 10, 10, 10],
+                    filename: filename,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
 
-                alert('PDF generated successfully!');
+                // Generate PDF
+                html2pdf().set(opt).from(pdfContent).save().then(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    alert('PDF generated successfully!');
+                }).catch(error => {
+                    console.error('Error generating PDF:', error);
+                    alert('Error generating PDF. Please check the console for details.');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+
             } catch (error) {
                 console.error('Error generating PDF:', error);
                 alert('Error generating PDF. Please check the console for details.');
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
+        }
+
+        // Create PDF HTML Template with Tailwind styling
+        function createPDFTemplate(data) {
+            const reportPeriod = data.reportMonth ? new Date(data.reportMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A';
+
+            // Get activities array
+            const activities = data.activities ? (Array.isArray(data.activities) ? data.activities : [data.activities]) : [];
+
+            // Get status badge class
+            const getStatusClass = (status) => {
+                const statusClasses = {
+                    'Excellent': 'bg-green-600 text-white',
+                    'Good': 'bg-blue-500 text-white',
+                    'Operational': 'bg-green-600 text-white',
+                    'Stable': 'bg-blue-500 text-white',
+                    'Active': 'bg-green-600 text-white',
+                    'Needs Attention': 'bg-orange-500 text-white',
+                    'Intermittent': 'bg-orange-500 text-white',
+                    'Critical': 'bg-red-600 text-white',
+                    'Offline': 'bg-red-600 text-white',
+                    'Issues Detected': 'bg-red-600 text-white',
+                    'Failed': 'bg-red-600 text-white',
+                    'Not Configured': 'bg-gray-500 text-white'
+                };
+                return statusClasses[status] || 'bg-gray-400 text-white';
+            };
+
+            const getSeverityClass = (severity) => {
+                const severityClasses = {
+                    'Critical': 'bg-red-600 text-white',
+                    'High': 'bg-orange-500 text-white',
+                    'Medium': 'bg-yellow-500 text-gray-900',
+                    'Low': 'bg-blue-500 text-white'
+                };
+                return severityClasses[severity] || 'bg-gray-400 text-white';
+            };
+
+            // Build cameras HTML
+            let camerasHTML = '';
+            let cameraFound = false;
+            for (let i = 1; i <= data.cameraCount; i++) {
+                const location = data[`camera_${i}_location`];
+                if (location) {
+                    cameraFound = true;
+                    const status = data[`camera_${i}_status`];
+                    const issues = data[`camera_${i}_issues`];
+                    const actions = data[`camera_${i}_actions`];
+                    const notes = data[`camera_${i}_notes`];
+
+                    camerasHTML += `
+                        <div class="mb-4 p-4 border-2 border-blue-900 rounded-lg bg-gray-50 break-inside-avoid">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-base font-bold text-blue-900">📷 Camera #${i}: ${location}</h4>
+                                ${status ? `<span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(status)}">${status}</span>` : ''}
+                            </div>
+                            ${issues ? `<div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Issues:</span> <span class="text-gray-800 text-sm">${issues}</span></div>` : ''}
+                            ${actions ? `<div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Actions:</span> <span class="text-gray-800 text-sm">${actions}</span></div>` : ''}
+                            ${notes ? `<div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Notes:</span> <span class="text-gray-800 text-sm">${notes}</span></div>` : ''}
+                        </div>
+                    `;
+                }
+            }
+            if (!cameraFound) {
+                camerasHTML = '<p class="text-gray-500 italic text-sm ml-2">No camera details recorded</p>';
+            }
+
+            // Build issues HTML
+            let issuesHTML = '';
+            let issueFound = false;
+            for (let i = 1; i <= data.issueCount; i++) {
+                const description = data[`issue_${i}_description`];
+                if (description) {
+                    issueFound = true;
+                    const severity = data[`issue_${i}_severity`];
+                    const resolution = data[`issue_${i}_resolution`];
+                    const parts = data[`issue_${i}_parts`];
+
+                    issuesHTML += `
+                        <div class="mb-4 p-4 border-2 border-orange-500 rounded-lg bg-orange-50 break-inside-avoid">
+                            <div class="flex items-center gap-3 mb-3">
+                                <h4 class="text-base font-bold text-red-600">⚠ Issue #${i}</h4>
+                                ${severity ? `<span class="px-3 py-1 rounded-full text-xs font-bold ${getSeverityClass(severity)}">${severity}</span>` : ''}
+                            </div>
+                            <div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Description:</span> <span class="text-gray-800 text-sm">${description}</span></div>
+                            ${resolution ? `<div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Resolution:</span> <span class="text-green-700 text-sm">${resolution}</span></div>` : ''}
+                            ${parts ? `<div class="mb-2"><span class="font-semibold text-gray-700 text-sm">Parts:</span> <span class="text-gray-800 text-sm">${parts}</span></div>` : ''}
+                        </div>
+                    `;
+                }
+            }
+            if (!issueFound) {
+                issuesHTML = '<p class="text-gray-500 italic text-sm ml-2">No issues recorded</p>';
+            }
+
+            return `
+                <div style="font-family: 'Barlow', sans-serif; font-size: 11px; line-height: 1.6; color: #333;">
+                    <!-- Cover Page -->
+                    <div class="break-after-page">
+                        <div class="bg-gradient-to-b from-blue-900 via-blue-700 to-blue-500 text-white py-20 px-8 text-center">
+                            <h1 class="text-5xl font-bold tracking-wider mb-2">ZONEBRITE</h1>
+                            <h2 class="text-4xl font-bold tracking-wider mb-4">SOLUTIONS</h2>
+                            <p class="text-lg italic mb-6">Protecting What Matters Most</p>
+                            <div class="w-1/2 h-1 bg-white mx-auto"></div>
+                        </div>
+
+                        <div class="mt-12 mx-8 p-6 border-2 border-blue-900 rounded-lg bg-white">
+                            <h3 class="text-2xl font-bold text-blue-900 text-center mb-2">MONTHLY MAINTENANCE</h3>
+                            <h3 class="text-xl font-bold text-blue-900 text-center">REPORT</h3>
+                        </div>
+
+                        <div class="mt-8 mx-8 p-6 bg-gray-100 rounded-lg">
+                            <div class="mb-4">
+                                <p class="font-bold text-gray-700 text-sm mb-1">CLIENT:</p>
+                                <p class="text-gray-900 text-base">${data.clientName || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-700 text-sm mb-1">REPORT PERIOD:</p>
+                                <p class="text-gray-900 text-base">${reportPeriod}</p>
+                            </div>
+                        </div>
+
+                        <div class="absolute bottom-8 left-0 right-0 text-center text-gray-600 text-xs">
+                            <p>Generated on: ${new Date().toLocaleDateString()}</p>
+                            <p>Zonebrite Solutions | Phone: Contact for details</p>
+                            <p>Email: info@zonebrite.com | www.zonebrite.com</p>
+                        </div>
+                    </div>
+
+                    <!-- Content Pages -->
+                    <div class="p-6">
+                        <!-- Section 1: Report Information -->
+                        <div class="mb-6 break-inside-avoid">
+                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
+                                <h3 class="text-base font-bold">📋 REPORT INFORMATION</h3>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
+                                <p class="text-sm"><span class="font-semibold text-gray-700">Report Date:</span> ${data.reportDate || 'N/A'}</p>
+                                <p class="text-sm"><span class="font-semibold text-gray-700">Property Address:</span> ${data.propertyAddress || 'N/A'}</p>
+                                <p class="text-sm"><span class="font-semibold text-gray-700">Technician:</span> ${data.technicianName || 'N/A'}</p>
+                                <p class="text-sm"><span class="font-semibold text-gray-700">Service Date:</span> ${data.serviceDate || 'N/A'}</p>
+                                <p class="text-sm"><span class="font-semibold text-gray-700">Next Scheduled Maintenance:</span> ${data.nextMaintenance || 'N/A'}</p>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: System Health Overview -->
+                        <div class="mb-6 break-inside-avoid">
+                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
+                                <h3 class="text-base font-bold">📊 SYSTEM HEALTH OVERVIEW</h3>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <span class="font-semibold text-gray-700 text-sm">Overall System Status:</span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(data.systemStatus)}">${data.systemStatus || 'N/A'}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-semibold text-gray-700 text-sm">Network Connectivity:</span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(data.networkStatus)}">${data.networkStatus || 'N/A'}</span>
+                                </div>
+
+                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2 mt-3">
+                                    <p class="text-sm"><span class="font-semibold text-gray-700">Total Cameras:</span> ${data.totalCameras || '0'}</p>
+                                    <p class="text-sm"><span class="font-semibold text-gray-700">Cameras Operational:</span> ${data.camerasOperational || '0'}</p>
+                                    <p class="text-sm"><span class="font-semibold text-gray-700">Cameras Requiring Attention:</span> ${data.camerasAttention || '0'}</p>
+                                </div>
+
+                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2 mt-3">
+                                    <p class="text-sm"><span class="font-semibold text-gray-700">System Uptime:</span> ${data.uptime || '0'}%</p>
+                                    <p class="text-sm"><span class="font-semibold text-gray-700">Recording Storage Used:</span> ${data.storageUsed || '0'}%</p>
+                                    <p class="text-sm"><span class="font-semibold text-gray-700">Storage Days Remaining:</span> ${data.storageDays || '0'} days</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Maintenance Activities -->
+                        <div class="mb-6 break-inside-avoid">
+                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
+                                <h3 class="text-base font-bold">✅ MAINTENANCE ACTIVITIES COMPLETED</h3>
+                            </div>
+                            ${activities.length > 0 ? `
+                                <div class="grid grid-cols-2 gap-3">
+                                    ${activities.map(activity => `
+                                        <div class="flex items-start gap-2">
+                                            <div class="flex-shrink-0 mt-1">
+                                                <div class="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
+                                                    <span class="text-white text-xs">✓</span>
+                                                </div>
+                                            </div>
+                                            <span class="text-gray-800 text-sm">${activity}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : '<p class="text-gray-500 italic text-sm ml-2">No activities recorded</p>'}
+                        </div>
+
+                        <!-- Section 4: Individual Camera Status -->
+                        <div class="mb-6">
+                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
+                                <h3 class="text-base font-bold">📹 INDIVIDUAL CAMERA STATUS</h3>
+                            </div>
+                            ${camerasHTML}
+                        </div>
+
+                        <!-- Section 5: Issues Identified & Resolved -->
+                        <div class="mb-6">
+                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
+                                <h3 class="text-base font-bold">🔧 ISSUES IDENTIFIED & RESOLVED</h3>
+                            </div>
+                            ${issuesHTML}
+                        </div>
+
+                        <!-- Section 6: Recommendations -->
+                        <div class="mb-6 break-inside-avoid">
+                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
+                                <h3 class="text-base font-bold">💡 RECOMMENDATIONS</h3>
+                            </div>
+                            ${data.maintenanceRec || data.upgradeOpp || data.optimizationSug ? `
+                                <div class="space-y-3">
+                                    ${data.maintenanceRec ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">Maintenance Recommendations:</p><p class="text-gray-800 text-sm">${data.maintenanceRec}</p></div>` : ''}
+                                    ${data.upgradeOpp ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">Upgrade Opportunities:</p><p class="text-gray-800 text-sm">${data.upgradeOpp}</p></div>` : ''}
+                                    ${data.optimizationSug ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">System Optimization:</p><p class="text-gray-800 text-sm">${data.optimizationSug}</p></div>` : ''}
+                                    ${data.estimatedCost || data.priorityLevel ? `
+                                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2 mt-3">
+                                            ${data.estimatedCost ? `<p class="text-sm"><span class="font-semibold text-gray-700">Estimated Cost:</span> ${data.estimatedCost}</p>` : ''}
+                                            ${data.priorityLevel ? `<p class="text-sm"><span class="font-semibold text-gray-700">Priority Level:</span> ${data.priorityLevel}</p>` : ''}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            ` : '<p class="text-gray-500 italic text-sm ml-2">No recommendations at this time</p>'}
+                        </div>
+
+                        <!-- Section 7: Storage & Recording -->
+                        <div class="mb-6 break-inside-avoid">
+                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
+                                <h3 class="text-base font-bold">💾 STORAGE & RECORDING DETAILS</h3>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2 mb-3">
+                                <p class="text-sm"><span class="font-semibold text-gray-700">Total Storage Capacity:</span> ${data.storageCapacity || 'N/A'}</p>
+                                <p class="text-sm"><span class="font-semibold text-gray-700">Current Storage Used:</span> ${data.storageCurrentlyUsed || 'N/A'}</p>
+                                <p class="text-sm"><span class="font-semibold text-gray-700">Recording Retention Period:</span> ${data.retentionPeriod || '0'} days</p>
+                                <p class="text-sm"><span class="font-semibold text-gray-700">Video Quality Settings:</span> ${data.videoQuality || 'N/A'}</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-semibold text-gray-700 text-sm">Backup Status:</span>
+                                <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(data.backupStatus)}">${data.backupStatus || 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        <!-- Section 8: System Updates -->
+                        <div class="mb-6 break-inside-avoid">
+                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
+                                <h3 class="text-base font-bold">🔄 SYSTEM UPDATES</h3>
+                            </div>
+                            ${data.firmwareVersion || data.softwareVersion || data.updatesApplied || data.updatesRecommended ? `
+                                <div class="space-y-3">
+                                    ${data.firmwareVersion || data.softwareVersion ? `
+                                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
+                                            ${data.firmwareVersion ? `<p class="text-sm"><span class="font-semibold text-gray-700">Current Firmware Version:</span> ${data.firmwareVersion}</p>` : ''}
+                                            ${data.softwareVersion ? `<p class="text-sm"><span class="font-semibold text-gray-700">Current Software Version:</span> ${data.softwareVersion}</p>` : ''}
+                                        </div>
+                                    ` : ''}
+                                    ${data.updatesApplied ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">Updates Applied This Month:</p><p class="text-gray-800 text-sm">${data.updatesApplied}</p></div>` : ''}
+                                    ${data.updatesRecommended ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">Updates Recommended:</p><p class="text-gray-800 text-sm">${data.updatesRecommended}</p></div>` : ''}
+                                </div>
+                            ` : '<p class="text-gray-500 italic text-sm ml-2">No updates information available</p>'}
+                        </div>
+
+                        <!-- Section 9: Summary -->
+                        <div class="mb-6 break-inside-avoid">
+                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
+                                <h3 class="text-base font-bold">📝 SUMMARY</h3>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="font-semibold text-gray-700 text-sm mb-1">Overall Assessment:</p>
+                                    <p class="text-gray-800 text-sm">${data.overallAssessment || 'N/A'}</p>
+                                </div>
+                                ${data.criticalItems ? `
+                                    <div class="p-4 bg-red-50 border-2 border-red-600 rounded-lg">
+                                        <p class="font-bold text-red-600 text-sm mb-2">⚠ CRITICAL ITEMS REQUIRING IMMEDIATE ATTENTION:</p>
+                                        <p class="text-gray-800 text-sm">${data.criticalItems}</p>
+                                    </div>
+                                ` : ''}
+                                ${data.focusAreas ? `
+                                    <div>
+                                        <p class="font-semibold text-gray-700 text-sm mb-1">Next Month Focus Areas:</p>
+                                        <p class="text-gray-800 text-sm">${data.focusAreas}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Section 10: Sign-off -->
+                        <div class="mb-6 break-inside-avoid">
+                            <div class="bg-blue-900 text-white px-4 py-2 rounded-lg mb-3">
+                                <h3 class="text-base font-bold">✍️ SIGN-OFF</h3>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-900 space-y-3">
+                                <p class="text-sm"><span class="font-semibold text-gray-700">Technician Signature:</span> <span class="text-blue-900 font-medium">${data.techSignature || 'N/A'}</span></p>
+                                ${data.clientAck ? `<p class="text-sm"><span class="font-semibold text-gray-700">Client Acknowledgment:</span> ${data.clientAck}</p>` : ''}
+                                ${data.clientFeedback ? `<div><p class="font-semibold text-gray-700 text-sm mb-1">Client Feedback:</p><p class="text-gray-800 text-sm">${data.clientFeedback}</p></div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
     </script>
 </body>
