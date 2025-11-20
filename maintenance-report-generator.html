@@ -704,6 +704,30 @@
             return data;
         }
 
+        // Validate and parse a month string (YYYY-MM format)
+        function parseMonthString(monthString) {
+            if (!monthString || typeof monthString !== 'string') {
+                return null;
+            }
+            // Check format: YYYY-MM
+            const match = monthString.match(/^(\d{4})-(\d{2})$/);
+            if (!match) {
+                return null;
+            }
+            const year = parseInt(match[1], 10);
+            const month = parseInt(match[2], 10);
+            // Validate year and month ranges
+            if (year < 1900 || year > 2100 || month < 1 || month > 12) {
+                return null;
+            }
+            const date = new Date(monthString + '-01');
+            // Check if the date is valid
+            if (isNaN(date.getTime())) {
+                return null;
+            }
+            return date;
+        }
+
         // Set Form Data
         function setFormData(data) {
             const form = document.getElementById('maintenanceForm');
@@ -782,9 +806,16 @@
         function restoreSession() {
             const savedData = localStorage.getItem('reportData');
             if (savedData) {
-                const data = JSON.parse(savedData);
-                setFormData(data);
-                updateLastSavedDisplay();
+                try {
+                    const data = JSON.parse(savedData);
+                    setFormData(data);
+                    updateLastSavedDisplay();
+                } catch (error) {
+                    console.error('Error parsing saved data:', error);
+                    alert('Error restoring saved data. The saved data may be corrupted.');
+                    localStorage.removeItem('reportData');
+                    localStorage.removeItem('lastSaved');
+                }
             }
             closeRestoreModal();
         }
@@ -836,6 +867,7 @@
             const form = document.getElementById('maintenanceForm');
             const requiredFields = form.querySelectorAll('[required]');
             let isValid = true;
+            let errorMessages = [];
 
             requiredFields.forEach(field => {
                 if (!field.value.trim()) {
@@ -846,8 +878,23 @@
                 }
             });
 
+            // Validate date fields specifically
+            const reportMonthField = form.querySelector('[name="reportMonth"]');
+            if (reportMonthField && reportMonthField.value) {
+                const date = parseMonthString(reportMonthField.value);
+                if (!date) {
+                    reportMonthField.classList.add('error');
+                    isValid = false;
+                    errorMessages.push('Report month has an invalid date format');
+                }
+            }
+
             if (!isValid) {
-                alert('Please fill in all required fields (marked with *)');
+                let alertMessage = 'Please fill in all required fields (marked with *)';
+                if (errorMessages.length > 0) {
+                    alertMessage += '\n\n' + errorMessages.join('\n');
+                }
+                alert(alertMessage);
                 // Scroll to first error
                 const firstError = form.querySelector('.error');
                 if (firstError) {
@@ -877,8 +924,10 @@
                 const clientNameClean = (formData.clientName || 'Client').replace(/[^a-zA-Z0-9]/g, '');
                 let monthYear = 'Report';
                 if (formData.reportMonth) {
-                    const date = new Date(formData.reportMonth + '-01');
-                    monthYear = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).replace(' ', '');
+                    const date = parseMonthString(formData.reportMonth);
+                    if (date) {
+                        monthYear = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).replace(' ', '');
+                    }
                 }
                 const filename = `${clientNameClean}_MaintenanceReport_${monthYear}.pdf`;
 
@@ -928,7 +977,13 @@
 
         // Create PDF HTML Template with vanilla CSS styling
         function createPDFTemplate(data) {
-            const reportPeriod = data.reportMonth ? new Date(data.reportMonth + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A';
+            let reportPeriod = 'N/A';
+            if (data.reportMonth) {
+                const date = parseMonthString(data.reportMonth);
+                if (date) {
+                    reportPeriod = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                }
+            }
 
             // Get activities array
             const activities = data.activities ? (Array.isArray(data.activities) ? data.activities : [data.activities]) : [];
