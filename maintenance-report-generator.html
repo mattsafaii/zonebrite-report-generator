@@ -895,14 +895,25 @@
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
 
-                // Generate PDF
-                html2pdf().set(opt).from(pdfContent).save().then(() => {
+                // Generate PDF - Create a temporary container element for proper rendering
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = pdfContent;
+                tempContainer.style.position = 'absolute';
+                tempContainer.style.left = '-9999px';
+                tempContainer.style.top = '0';
+                document.body.appendChild(tempContainer);
+
+                html2pdf().set(opt).from(tempContainer).save().then(() => {
+                    document.body.removeChild(tempContainer);
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                     alert('PDF generated successfully!');
                 }).catch(error => {
                     console.error('Error generating PDF:', error);
                     alert('Error generating PDF. Please check the console for details.');
+                    if (document.body.contains(tempContainer)) {
+                        document.body.removeChild(tempContainer);
+                    }
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                 });
