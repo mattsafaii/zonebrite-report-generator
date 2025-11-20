@@ -46,7 +46,27 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Report Month/Year <span class="required">*</span></label>
-                        <input type="month" name="reportMonth" required>
+                        <div class="month-year-select">
+                            <select name="reportMonthSelect" id="reportMonthSelect" required>
+                                <option value="">Month</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <select name="reportYearSelect" id="reportYearSelect" required>
+                                <option value="">Year</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="reportMonth" id="reportMonth">
                         <span class="error-message">This field is required</span>
                     </div>
                     <div class="form-group">
@@ -465,6 +485,44 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize month/year dropdowns
+            const monthSelect = document.getElementById('reportMonthSelect');
+            const yearSelect = document.getElementById('reportYearSelect');
+            const reportMonthHidden = document.getElementById('reportMonth');
+
+            // Populate year dropdown (current year - 2 to current year + 5)
+            const currentYear = new Date().getFullYear();
+            for (let year = currentYear - 2; year <= currentYear + 5; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+
+            // Set default to current month/year
+            const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+            monthSelect.value = currentMonth;
+            yearSelect.value = currentYear;
+
+            // Function to update hidden field
+            function updateReportMonth() {
+                if (monthSelect.value && yearSelect.value) {
+                    reportMonthHidden.value = `${yearSelect.value}-${monthSelect.value}`;
+                    // Clear error classes when valid values selected
+                    monthSelect.classList.remove('error');
+                    yearSelect.classList.remove('error');
+                } else {
+                    reportMonthHidden.value = '';
+                }
+            }
+
+            // Add event listeners to dropdowns
+            monthSelect.addEventListener('change', updateReportMonth);
+            yearSelect.addEventListener('change', updateReportMonth);
+
+            // Initialize hidden field
+            updateReportMonth();
+
             // Set default dates
             const today = new Date().toISOString().split('T')[0];
             document.querySelector('[name="reportDate"]').value = today;
@@ -765,6 +823,19 @@
                 }
             }
 
+            // Restore month/year dropdowns from saved reportMonth value
+            if (data.reportMonth) {
+                const match = data.reportMonth.match(/^(\d{4})-(\d{2})$/);
+                if (match) {
+                    const monthSelect = document.getElementById('reportMonthSelect');
+                    const yearSelect = document.getElementById('reportYearSelect');
+                    if (monthSelect && yearSelect) {
+                        yearSelect.value = match[1];
+                        monthSelect.value = match[2];
+                    }
+                }
+            }
+
             updateProgress();
         }
 
@@ -880,13 +951,22 @@
 
             // Validate date fields specifically
             const reportMonthField = form.querySelector('[name="reportMonth"]');
+            const monthSelect = document.getElementById('reportMonthSelect');
+            const yearSelect = document.getElementById('reportYearSelect');
+
             if (reportMonthField && reportMonthField.value) {
                 const date = parseMonthString(reportMonthField.value);
                 if (!date) {
-                    reportMonthField.classList.add('error');
+                    // Apply error class to dropdowns instead of hidden field
+                    if (monthSelect) monthSelect.classList.add('error');
+                    if (yearSelect) yearSelect.classList.add('error');
                     isValid = false;
                     errorMessages.push('Report month has an invalid date format');
                 }
+            } else if (!reportMonthField.value) {
+                // If hidden field is empty, ensure dropdowns show error
+                if (monthSelect && !monthSelect.value) monthSelect.classList.add('error');
+                if (yearSelect && !yearSelect.value) yearSelect.classList.add('error');
             }
 
             if (!isValid) {

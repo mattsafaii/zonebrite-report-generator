@@ -247,6 +247,20 @@ textarea.error + .error-message {
     display: block;
 }
 
+/* Month/Year Select */
+.month-year-select {
+    display: flex;
+    gap: 10px;
+}
+
+.month-year-select select {
+    flex: 1;
+}
+
+.month-year-select select:first-child {
+    flex: 1.5;
+}
+
 /* Checkbox Styles */
 .checkbox-group {
     display: grid;
