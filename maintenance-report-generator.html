@@ -1,591 +1,1694 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zonebrite Solutions - Monthly Maintenance Report Generator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">ZONEBRITE SOLUTIONS</div>
-            <div class="tagline">Protecting What Matters Most</div>
-            <div class="page-title">Monthly Maintenance Report Generator</div>
-        </div>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>
+			Zonebrite Solutions - Monthly Maintenance Report Generator
+		</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <div class="status-item">
-                <strong>Last Saved:</strong> <span id="lastSaved">Never</span>
-            </div>
-            <div class="progress-bar-container">
-                <div class="progress-label">Form Progress: <span id="progressText">0%</span></div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-            </div>
-            <div class="save-indicator" id="saveIndicator">
-                ✓ Saved
-            </div>
-        </div>
+		<style>
+			:root {
+				/* Primary Colors */
+				--fence-green: #09332c;
+				--fiery-glow: #f0531c;
 
-        <!-- Form -->
-        <form id="maintenanceForm">
-            <!-- Section 1: Report Header -->
-            <div class="form-section">
-                <h2 class="section-title">
-                    <span class="section-number">1</span>
-                    Report Header
-                </h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Report Month/Year <span class="required">*</span></label>
-                        <div class="month-year-select">
-                            <select name="reportMonthSelect" id="reportMonthSelect" required>
-                                <option value="">Month</option>
-                                <option value="01">January</option>
-                                <option value="02">February</option>
-                                <option value="03">March</option>
-                                <option value="04">April</option>
-                                <option value="05">May</option>
-                                <option value="06">June</option>
-                                <option value="07">July</option>
-                                <option value="08">August</option>
-                                <option value="09">September</option>
-                                <option value="10">October</option>
-                                <option value="11">November</option>
-                                <option value="12">December</option>
-                            </select>
-                            <select name="reportYearSelect" id="reportYearSelect" required>
-                                <option value="">Year</option>
-                            </select>
-                        </div>
-                        <input type="hidden" name="reportMonth" id="reportMonth">
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Report Generated Date <span class="required">*</span></label>
-                        <input type="date" name="reportDate" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Client Business Name <span class="required">*</span></label>
-                        <input type="text" name="clientName" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Property Address <span class="required">*</span></label>
-                        <input type="text" name="propertyAddress" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Technician Name <span class="required">*</span></label>
-                        <input type="text" name="technicianName" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Service Date(s) Completed <span class="required">*</span></label>
-                        <input type="date" name="serviceDate" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Next Scheduled Maintenance <span class="required">*</span></label>
-                        <input type="date" name="nextMaintenance" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                </div>
-            </div>
+				/* Secondary Colors */
+				--norfolk-green: #2e4b3c;
+				--pumpkin-vapor: #ffa74f;
 
-            <!-- Section 2: System Health Overview -->
-            <div class="form-section">
-                <h2 class="section-title">
-                    <span class="section-number">2</span>
-                    System Health Overview
-                </h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Overall System Status <span class="required">*</span></label>
-                        <select name="systemStatus" required>
-                            <option value="">Select Status</option>
-                            <option value="Excellent">Excellent</option>
-                            <option value="Good">Good</option>
-                            <option value="Needs Attention">Needs Attention</option>
-                            <option value="Critical">Critical</option>
-                        </select>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Network Connectivity Status <span class="required">*</span></label>
-                        <select name="networkStatus" required>
-                            <option value="">Select Status</option>
-                            <option value="Stable">Stable</option>
-                            <option value="Intermittent">Intermittent</option>
-                            <option value="Issues Detected">Issues Detected</option>
-                        </select>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Total Cameras in System <span class="required">*</span></label>
-                        <input type="number" name="totalCameras" min="0" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Cameras Operational <span class="required">*</span></label>
-                        <input type="number" name="camerasOperational" min="0" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Cameras Requiring Attention</label>
-                        <input type="number" name="camerasAttention" readonly>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>System Uptime Percentage <span class="required">*</span></label>
-                        <input type="number" name="uptime" min="0" max="100" step="0.01" required>
-                        <span class="error-message">This field is required (0-100)</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Storage Days Remaining <span class="required">*</span></label>
-                        <input type="number" name="storageDays" min="0" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label>Recording Storage Used <span class="required">*</span></label>
-                        <div class="range-container">
-                            <input type="range" name="storageUsed" min="0" max="100" value="50" required>
-                            <span class="range-value"><span id="storageValue">50</span>%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+				/* Neutral Colors */
+				--venetian-lace: #f7edda;
+				--macadamia-beige: #f7dfba;
 
-            <!-- Section 3: Maintenance Activities Completed -->
-            <div class="form-section">
-                <h2 class="section-title">
-                    <span class="section-number">3</span>
-                    Maintenance Activities Completed
-                </h2>
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity1" name="activities" value="Camera lens cleaning">
-                        <label for="activity1">Camera lens cleaning</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity2" name="activities" value="Camera housing inspection">
-                        <label for="activity2">Camera housing inspection</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity3" name="activities" value="Camera angle/positioning verification">
-                        <label for="activity3">Camera angle/positioning verification</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity4" name="activities" value="Recording quality verification">
-                        <label for="activity4">Recording quality verification</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity5" name="activities" value="Playback functionality test">
-                        <label for="activity5">Playback functionality test</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity6" name="activities" value="Storage device health check">
-                        <label for="activity6">Storage device health check</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity7" name="activities" value="Network connection verification">
-                        <label for="activity7">Network connection verification</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity8" name="activities" value="Firmware/software updates applied">
-                        <label for="activity8">Firmware/software updates applied</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity9" name="activities" value="Power supply inspection">
-                        <label for="activity9">Power supply inspection</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity10" name="activities" value="Cable and connection inspection">
-                        <label for="activity10">Cable and connection inspection</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity11" name="activities" value="Access control system test">
-                        <label for="activity11">Access control system test (if applicable)</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity12" name="activities" value="Remote viewing functionality test">
-                        <label for="activity12">Remote viewing functionality test</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity13" name="activities" value="Motion detection calibration">
-                        <label for="activity13">Motion detection calibration</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity14" name="activities" value="Night vision verification">
-                        <label for="activity14">Night vision verification</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="activity15" name="activities" value="Weatherproofing inspection">
-                        <label for="activity15">Weatherproofing inspection (outdoor cameras)</label>
-                    </div>
-                </div>
-            </div>
+				/* Text Colors */
+				--dark-gray: #333333;
 
-            <!-- Section 4: Individual Camera Status -->
-            <div class="form-section">
-                <h2 class="section-title">
-                    <span class="section-number">4</span>
-                    Individual Camera Status
-                </h2>
-                <div id="camerasContainer">
-                    <!-- Dynamic camera entries will be added here -->
-                </div>
-                <button type="button" class="add-btn" onclick="addCamera()">Add Camera</button>
-            </div>
+				/* Status Colors */
+				--success-green: #28a745;
+				--danger-red: #dc3545;
 
-            <!-- Section 5: Issues Identified & Resolved -->
-            <div class="form-section">
-                <h2 class="section-title">
-                    <span class="section-number">5</span>
-                    Issues Identified & Resolved
-                </h2>
-                <div id="issuesContainer">
-                    <!-- Dynamic issue entries will be added here -->
-                </div>
-                <button type="button" class="add-btn" onclick="addIssue()">Add Issue</button>
-            </div>
+				/* Legacy mappings */
+				--primary-color: var(--fence-green);
+				--accent-color: var(--fiery-glow);
+				--secondary-color: var(--norfolk-green);
+				--light-bg: var(--venetian-lace);
+				--card-bg: var(--macadamia-beige);
+				--border-gray: #dddddd;
+			}
 
-            <!-- Section 6: Recommendations -->
-            <div class="form-section">
-                <h2 class="section-title">
-                    <span class="section-number">6</span>
-                    Recommendations
-                </h2>
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label>Maintenance Recommendations</label>
-                        <textarea name="maintenanceRec" rows="4"></textarea>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label>Upgrade Opportunities</label>
-                        <textarea name="upgradeOpp" rows="4"></textarea>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label>System Optimization Suggestions</label>
-                        <textarea name="optimizationSug" rows="4"></textarea>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Estimated Cost (if applicable)</label>
-                        <input type="text" name="estimatedCost" placeholder="$0.00">
-                    </div>
-                    <div class="form-group">
-                        <label>Priority Level</label>
-                        <select name="priorityLevel">
-                            <option value="">Select Priority</option>
-                            <option value="Low">Low</option>
-                            <option value="Medium">Medium</option>
-                            <option value="High">High</option>
-                            <option value="Urgent">Urgent</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
 
-            <!-- Section 7: Storage & Recording Details -->
-            <div class="form-section">
-                <h2 class="section-title">
-                    <span class="section-number">7</span>
-                    Storage & Recording Details
-                </h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Total Storage Capacity <span class="required">*</span></label>
-                        <input type="text" name="storageCapacity" placeholder="e.g., 2TB" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Current Storage Used <span class="required">*</span></label>
-                        <input type="text" name="storageCurrentlyUsed" placeholder="e.g., 1.2TB" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Recording Retention Period (days) <span class="required">*</span></label>
-                        <input type="number" name="retentionPeriod" min="0" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Video Quality Settings <span class="required">*</span></label>
-                        <select name="videoQuality" required>
-                            <option value="">Select Quality</option>
-                            <option value="4K">4K</option>
-                            <option value="1080p">1080p</option>
-                            <option value="720p">720p</option>
-                            <option value="Custom">Custom</option>
-                        </select>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Backup Status <span class="required">*</span></label>
-                        <select name="backupStatus" required>
-                            <option value="">Select Status</option>
-                            <option value="Active">Active</option>
-                            <option value="Not Configured">Not Configured</option>
-                            <option value="Failed">Failed</option>
-                        </select>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                </div>
-            </div>
+			body {
+				font-family: "Barlow", sans-serif;
+				background-color: white;
+				color: var(--dark-gray);
+				line-height: 1.6;
+				padding: 20px;
+			}
 
-            <!-- Section 8: System Updates -->
-            <div class="form-section">
-                <h2 class="section-title">
-                    <span class="section-number">8</span>
-                    System Updates
-                </h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Current Firmware Version</label>
-                        <input type="text" name="firmwareVersion">
-                    </div>
-                    <div class="form-group">
-                        <label>Current Software Version</label>
-                        <input type="text" name="softwareVersion">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label>Updates Applied This Month</label>
-                        <textarea name="updatesApplied" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label>Updates Recommended</label>
-                        <textarea name="updatesRecommended" rows="3"></textarea>
-                    </div>
-                </div>
-            </div>
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				background-color: white;
+				padding: 40px;
+				border-radius: 8px;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			}
 
-            <!-- Section 9: Summary -->
-            <div class="form-section">
-                <h2 class="section-title">
-                    <span class="section-number">9</span>
-                    Summary
-                </h2>
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label>Overall Assessment <span class="required">*</span></label>
-                        <textarea name="overallAssessment" rows="4" required></textarea>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label>Critical Items Requiring Immediate Attention</label>
-                        <textarea name="criticalItems" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label>Next Month's Focus Areas</label>
-                        <textarea name="focusAreas" rows="3"></textarea>
-                    </div>
-                </div>
-            </div>
+			/* Header Styles */
+			.header {
+				text-align: center;
+				border-bottom: 3px solid var(--fence-green);
+				padding-bottom: 20px;
+				margin-bottom: 30px;
+			}
 
-            <!-- Section 10: Sign-off -->
-            <div class="form-section">
-                <h2 class="section-title">
-                    <span class="section-number">10</span>
-                    Sign-off
-                </h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Technician Signature/Name <span class="required">*</span></label>
-                        <input type="text" name="techSignature" required>
-                        <span class="error-message">This field is required</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Client Acknowledgment Name (optional)</label>
-                        <input type="text" name="clientAck">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label>Client Notes/Feedback (optional)</label>
-                        <textarea name="clientFeedback" rows="3"></textarea>
-                    </div>
-                </div>
-            </div>
+			.logo {
+				font-size: 36px;
+				font-weight: 700;
+				color: var(--fence-green);
+				letter-spacing: 2px;
+				margin-bottom: 5px;
+			}
 
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button type="button" class="btn btn-primary" onclick="generatePDF()">Generate PDF</button>
-                <button type="button" class="btn btn-secondary" onclick="saveFormData()">Save Progress</button>
-                <button type="button" class="btn btn-danger" onclick="showClearConfirmation()">Clear Form</button>
-            </div>
-        </form>
-    </div>
+			.tagline {
+				font-size: 16px;
+				color: var(--norfolk-green);
+				font-weight: 400;
+				font-style: italic;
+				margin-bottom: 15px;
+			}
 
-    <!-- Restore Session Modal -->
-    <div id="restoreModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Restore Previous Session?</div>
-            <div class="modal-body">
-                We found a previously saved report. Would you like to restore it and continue where you left off?
-            </div>
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closeRestoreModal()">Start Fresh</button>
-                <button class="btn btn-primary" onclick="restoreSession()">Restore</button>
-            </div>
-        </div>
-    </div>
+			.page-title {
+				font-size: 28px;
+				font-weight: 600;
+				color: var(--dark-gray);
+				margin-top: 10px;
+			}
 
-    <!-- Clear Confirmation Modal -->
-    <div id="clearModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Clear All Data?</div>
-            <div class="modal-body">
-                Are you sure you want to clear all form data? This action cannot be undone.
-            </div>
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closeClearModal()">Cancel</button>
-                <button class="btn btn-danger" onclick="clearForm()">Clear All</button>
-            </div>
-        </div>
-    </div>
+			/* Status Bar */
+			.status-bar {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				background-color: var(--venetian-lace);
+				padding: 15px 20px;
+				border-radius: 6px;
+				margin-bottom: 30px;
+				flex-wrap: wrap;
+				gap: 10px;
+			}
 
-    <script>
-        // Global variables
-        let cameraCount = 0;
-        let issueCount = 0;
-        let autoSaveInterval;
+			.status-item {
+				font-size: 14px;
+				color: var(--norfolk-green);
+			}
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize month/year dropdowns
-            const monthSelect = document.getElementById('reportMonthSelect');
-            const yearSelect = document.getElementById('reportYearSelect');
-            const reportMonthHidden = document.getElementById('reportMonth');
+			.status-item strong {
+				color: var(--dark-gray);
+			}
 
-            // Populate year dropdown (current year - 2 to current year + 5)
-            const currentYear = new Date().getFullYear();
-            for (let year = currentYear - 2; year <= currentYear + 5; year++) {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                yearSelect.appendChild(option);
-            }
+			.progress-bar-container {
+				flex: 1;
+				min-width: 200px;
+				margin: 0 20px;
+			}
 
-            // Set default to current month/year
-            const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
-            monthSelect.value = currentMonth;
-            yearSelect.value = currentYear;
+			.progress-label {
+				font-size: 12px;
+				color: var(--norfolk-green);
+				margin-bottom: 5px;
+			}
 
-            // Function to update hidden field
-            function updateReportMonth() {
-                if (monthSelect.value && yearSelect.value) {
-                    reportMonthHidden.value = `${yearSelect.value}-${monthSelect.value}`;
-                    // Clear error classes when valid values selected
-                    monthSelect.classList.remove('error');
-                    yearSelect.classList.remove('error');
-                } else {
-                    reportMonthHidden.value = '';
-                }
-            }
+			.progress-bar {
+				width: 100%;
+				height: 8px;
+				background-color: #e0e0e0;
+				border-radius: 4px;
+				overflow: hidden;
+			}
 
-            // Add event listeners to dropdowns
-            monthSelect.addEventListener('change', updateReportMonth);
-            yearSelect.addEventListener('change', updateReportMonth);
+			.progress-fill {
+				height: 100%;
+				background: linear-gradient(
+					90deg,
+					var(--fiery-glow),
+					var(--fence-green)
+				);
+				width: 0%;
+				transition: width 0.3s ease;
+			}
 
-            // Initialize hidden field
-            updateReportMonth();
+			/* Form Sections */
+			.form-section {
+				margin-bottom: 40px;
+				border-left: 4px solid var(--fence-green);
+				padding-left: 20px;
+			}
 
-            // Set default dates
-            const today = new Date().toISOString().split('T')[0];
-            document.querySelector('[name="reportDate"]').value = today;
+			.section-title {
+				font-size: 22px;
+				font-weight: 600;
+				color: var(--fence-green);
+				margin-bottom: 20px;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
 
-            // Calculate next maintenance date (30 days from today)
-            const nextMonth = new Date();
-            nextMonth.setDate(nextMonth.getDate() + 30);
-            document.querySelector('[name="nextMaintenance"]').value = nextMonth.toISOString().split('T')[0];
+			.section-number {
+				background-color: var(--fence-green);
+				color: white;
+				width: 32px;
+				height: 32px;
+				border-radius: 50%;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 16px;
+				font-weight: 700;
+			}
 
-            // Check for saved data
-            if (localStorage.getItem('reportData')) {
-                document.getElementById('restoreModal').style.display = 'block';
-            } else {
-                // Add initial camera and issue
-                addCamera();
-                addIssue();
-            }
+			/* Form Groups */
+			.form-row {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 20px;
+				margin-bottom: 20px;
+			}
 
-            // Set up auto-save
-            autoSaveInterval = setInterval(autoSave, 30000); // Every 30 seconds
+			.form-group {
+				display: flex;
+				flex-direction: column;
+			}
 
-            // Add event listeners for auto-save on blur
-            const inputs = document.querySelectorAll('input, select, textarea');
-            inputs.forEach(input => {
-                input.addEventListener('blur', autoSave);
-            });
+			.form-group.full-width {
+				grid-column: 1 / -1;
+			}
 
-            // Update storage slider value display
-            const storageSlider = document.querySelector('[name="storageUsed"]');
-            storageSlider.addEventListener('input', function() {
-                document.getElementById('storageValue').textContent = this.value;
-            });
+			label {
+				font-size: 14px;
+				font-weight: 500;
+				color: var(--dark-gray);
+				margin-bottom: 8px;
+				display: flex;
+				align-items: center;
+				gap: 5px;
+			}
 
-            // Auto-calculate cameras requiring attention
-            const totalCamerasInput = document.querySelector('[name="totalCameras"]');
-            const operationalCamerasInput = document.querySelector('[name="camerasOperational"]');
+			.required {
+				color: var(--danger-red);
+				font-weight: 700;
+			}
 
-            function updateCamerasAttention() {
-                const total = parseInt(totalCamerasInput.value) || 0;
-                const operational = parseInt(operationalCamerasInput.value) || 0;
-                document.querySelector('[name="camerasAttention"]').value = Math.max(0, total - operational);
-                updateProgress();
-            }
+			.tooltip {
+				font-size: 12px;
+				color: var(--norfolk-green);
+				font-weight: 400;
+				font-style: italic;
+			}
 
-            totalCamerasInput.addEventListener('input', updateCamerasAttention);
-            operationalCamerasInput.addEventListener('input', updateCamerasAttention);
+			input[type="text"],
+			input[type="date"],
+			input[type="number"],
+			input[type="month"],
+			select,
+			textarea {
+				padding: 10px 12px;
+				border: 1px solid var(--border-gray);
+				border-radius: 4px;
+				font-family: "Barlow", sans-serif;
+				font-size: 14px;
+				color: var(--dark-gray);
+				background-color: white;
+				transition:
+					border-color 0.3s ease,
+					box-shadow 0.3s ease;
+			}
 
-            // Update progress on any form change
-            document.getElementById('maintenanceForm').addEventListener('input', updateProgress);
-            document.getElementById('maintenanceForm').addEventListener('change', updateProgress);
+			input:focus,
+			select:focus,
+			textarea:focus {
+				outline: none;
+				border-color: var(--fiery-glow);
+				box-shadow: 0 0 0 3px rgba(240, 83, 28, 0.1);
+			}
 
-            // Initial progress update
-            updateProgress();
-        });
+			input.error,
+			select.error,
+			textarea.error {
+				border-color: var(--danger-red);
+			}
 
-        // Add Camera
-        function addCamera() {
-            cameraCount++;
-            const container = document.getElementById('camerasContainer');
-            const cameraDiv = document.createElement('div');
-            cameraDiv.className = 'dynamic-item';
-            cameraDiv.id = `camera-${cameraCount}`;
-            cameraDiv.innerHTML = `
+			textarea {
+				resize: vertical;
+				min-height: 80px;
+			}
+
+			.error-message {
+				color: var(--danger-red);
+				font-size: 12px;
+				margin-top: 5px;
+				display: none;
+			}
+
+			input.error + .error-message,
+			select.error + .error-message,
+			textarea.error + .error-message {
+				display: block;
+			}
+
+			/* Checkbox Styles */
+			.checkbox-group {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+				gap: 12px;
+				margin-top: 10px;
+			}
+
+			.checkbox-item {
+				display: flex;
+				align-items: center;
+				padding: 8px;
+				border-radius: 4px;
+				transition: background-color 0.2s ease;
+			}
+
+			.checkbox-item:hover {
+				background-color: var(--venetian-lace);
+			}
+
+			.checkbox-item input[type="checkbox"] {
+				width: 18px;
+				height: 18px;
+				margin-right: 10px;
+				cursor: pointer;
+			}
+
+			.checkbox-item label {
+				margin: 0;
+				cursor: pointer;
+				flex: 1;
+			}
+
+			/* Range Slider */
+			.range-container {
+				display: flex;
+				align-items: center;
+				gap: 15px;
+			}
+
+			input[type="range"] {
+				flex: 1;
+				height: 6px;
+				border-radius: 3px;
+				background: linear-gradient(
+					90deg,
+					var(--success-green) 0%,
+					var(--pumpkin-vapor) 70%,
+					var(--danger-red) 100%
+				);
+				outline: none;
+			}
+
+			.range-value {
+				font-size: 18px;
+				font-weight: 600;
+				color: var(--fence-green);
+				min-width: 50px;
+				text-align: right;
+			}
+
+			/* Dynamic Sections */
+			.dynamic-item {
+				background-color: var(--macadamia-beige);
+				padding: 20px;
+				border-radius: 6px;
+				margin-bottom: 15px;
+				position: relative;
+			}
+
+			.dynamic-item-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 15px;
+			}
+
+			.item-number {
+				font-weight: 600;
+				color: var(--fence-green);
+			}
+
+			.remove-btn {
+				background-color: var(--danger-red);
+				color: white;
+				border: none;
+				padding: 6px 12px;
+				border-radius: 4px;
+				cursor: pointer;
+				font-family: "Barlow", sans-serif;
+				font-size: 13px;
+				font-weight: 500;
+				transition: background-color 0.3s ease;
+			}
+
+			.remove-btn:hover {
+				background-color: #c82333;
+			}
+
+			.add-btn {
+				background-color: var(--fiery-glow);
+				color: white;
+				border: none;
+				padding: 10px 20px;
+				border-radius: 4px;
+				cursor: pointer;
+				font-family: "Barlow", sans-serif;
+				font-size: 14px;
+				font-weight: 500;
+				margin-top: 10px;
+				transition: background-color 0.3s ease;
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.add-btn:hover {
+				background-color: #d4461a;
+			}
+
+			.add-btn::before {
+				content: "+";
+				font-size: 18px;
+				font-weight: 700;
+			}
+
+			/* Status Indicators */
+			.status-excellent {
+				color: var(--success-green);
+			}
+			.status-good {
+				color: var(--norfolk-green);
+			}
+			.status-attention {
+				color: var(--pumpkin-vapor);
+			}
+			.status-critical {
+				color: var(--danger-red);
+			}
+
+			/* Action Buttons */
+			.action-buttons {
+				display: flex;
+				gap: 15px;
+				justify-content: center;
+				margin-top: 40px;
+				padding-top: 30px;
+				border-top: 2px solid var(--border-gray);
+				flex-wrap: wrap;
+			}
+
+			.btn {
+				padding: 14px 30px;
+				border: none;
+				border-radius: 6px;
+				font-family: "Barlow", sans-serif;
+				font-size: 16px;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.btn-primary {
+				background-color: var(--fiery-glow);
+				color: white;
+				box-shadow: 0 4px 6px rgba(240, 83, 28, 0.3);
+			}
+
+			.btn-primary:hover {
+				background-color: #d4461a;
+				box-shadow: 0 6px 12px rgba(240, 83, 28, 0.4);
+				transform: translateY(-2px);
+			}
+
+			.btn-secondary {
+				background-color: var(--norfolk-green);
+				color: white;
+			}
+
+			.btn-secondary:hover {
+				background-color: var(--fence-green);
+			}
+
+			.btn-danger {
+				background-color: white;
+				color: var(--danger-red);
+				border: 2px solid var(--danger-red);
+			}
+
+			.btn-danger:hover {
+				background-color: var(--danger-red);
+				color: white;
+			}
+
+			/* Modal */
+			.modal {
+				display: none;
+				position: fixed;
+				z-index: 1000;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.5);
+				animation: fadeIn 0.3s ease;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			.modal-content {
+				background-color: white;
+				margin: 15% auto;
+				padding: 30px;
+				border-radius: 8px;
+				max-width: 500px;
+				box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+				animation: slideIn 0.3s ease;
+			}
+
+			@keyframes slideIn {
+				from {
+					transform: translateY(-50px);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+
+			.modal-header {
+				font-size: 20px;
+				font-weight: 600;
+				margin-bottom: 15px;
+				color: var(--fence-green);
+			}
+
+			.modal-body {
+				margin-bottom: 20px;
+				color: var(--dark-gray);
+				line-height: 1.6;
+			}
+
+			.modal-buttons {
+				display: flex;
+				gap: 10px;
+				justify-content: flex-end;
+			}
+
+			.modal-buttons .btn {
+				padding: 10px 20px;
+				font-size: 14px;
+			}
+
+			/* Responsive Design */
+			@media (max-width: 768px) {
+				.container {
+					padding: 20px;
+				}
+
+				.logo {
+					font-size: 28px;
+				}
+
+				.page-title {
+					font-size: 22px;
+				}
+
+				.status-bar {
+					flex-direction: column;
+					align-items: flex-start;
+				}
+
+				.progress-bar-container {
+					width: 100%;
+					margin: 10px 0;
+				}
+
+				.form-row {
+					grid-template-columns: 1fr;
+				}
+
+				.checkbox-group {
+					grid-template-columns: 1fr;
+				}
+
+				.action-buttons {
+					flex-direction: column;
+				}
+
+				.btn {
+					width: 100%;
+				}
+			}
+
+			/* Auto-save indicator */
+			.save-indicator {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				font-size: 12px;
+				padding: 4px 8px;
+				border-radius: 4px;
+				background-color: var(--success-green);
+				color: white;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+			}
+
+			.save-indicator.show {
+				opacity: 1;
+			}
+
+			/* Loading spinner */
+			.spinner {
+				border: 3px solid var(--venetian-lace);
+				border-top: 3px solid var(--fiery-glow);
+				border-radius: 50%;
+				width: 20px;
+				height: 20px;
+				animation: spin 1s linear infinite;
+				display: inline-block;
+				margin-left: 10px;
+			}
+
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<!-- Hidden logo image for PDF generation -->
+		<img id="logo-img" src="logo.png" style="display: none;">
+
+		<div class="container">
+			<!-- Header -->
+			<div class="header">
+				<div class="logo">ZONEBRITE SOLUTIONS</div>
+				<div class="page-title">
+					Monthly Maintenance Report Generator
+				</div>
+			</div>
+
+			<!-- Status Bar -->
+			<div class="status-bar">
+				<div class="status-item">
+					<strong>Last Saved:</strong>
+					<span id="lastSaved">Never</span>
+				</div>
+				<div class="progress-bar-container">
+					<div class="progress-label">
+						Form Progress: <span id="progressText">0%</span>
+					</div>
+					<div class="progress-bar">
+						<div class="progress-fill" id="progressFill"></div>
+					</div>
+				</div>
+				<div class="save-indicator" id="saveIndicator">✓ Saved</div>
+			</div>
+
+			<!-- Form -->
+			<form id="maintenanceForm">
+				<!-- Section 1: Report Header -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">1</span>
+						Report Header
+					</h2>
+					<div class="form-row">
+						<div class="form-group">
+							<label>Report Number</label>
+							<input
+								type="text"
+								name="reportNumber"
+								placeholder="e.g., ZB-2024-001"
+							/>
+						</div>
+						<div class="form-group">
+							<label
+								>Service Type
+								<span class="required">*</span></label
+							>
+							<select name="serviceType" required>
+								<option value="">Select Type</option>
+								<option value="Monthly">Monthly</option>
+								<option value="Quarterly">Quarterly</option>
+								<option value="Emergency">Emergency</option>
+							</select>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label
+								>Report Month/Year
+								<span class="required">*</span></label
+							>
+							<div class="month-year-select">
+								<select
+									name="reportMonth_month"
+									id="reportMonth_month"
+									required
+								>
+									<option value="">Month</option>
+									<option value="01">January</option>
+									<option value="02">February</option>
+									<option value="03">March</option>
+									<option value="04">April</option>
+									<option value="05">May</option>
+									<option value="06">June</option>
+									<option value="07">July</option>
+									<option value="08">August</option>
+									<option value="09">September</option>
+									<option value="10">October</option>
+									<option value="11">November</option>
+									<option value="12">December</option>
+								</select>
+								<select
+									name="reportMonth_year"
+									id="reportMonth_year"
+									required
+								>
+									<option value="">Year</option>
+								</select>
+							</div>
+							<input
+								type="hidden"
+								name="reportMonth"
+								id="reportMonth_hidden"
+							/>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label
+								>Client Business Name
+								<span class="required">*</span></label
+							>
+							<input type="text" name="clientName" required />
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label
+								>Property Address
+								<span class="required">*</span></label
+							>
+							<input
+								type="text"
+								name="propertyAddress"
+								required
+							/>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label>Contact Person</label>
+							<input
+								type="text"
+								name="contactPerson"
+								placeholder="Name"
+							/>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label
+								>Technician Name
+								<span class="required">*</span></label
+							>
+							<input type="text" name="technicianName" required />
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label
+								>Service Date
+								<span class="required">*</span></label
+							>
+							<input type="date" name="serviceDate" required />
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label>Time In</label>
+							<input type="time" name="timeIn" />
+						</div>
+						<div class="form-group">
+							<label>Time Out</label>
+							<input type="time" name="timeOut" />
+						</div>
+					</div>
+				</div>
+
+				<!-- Section 2: System Health Overview -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">2</span>
+						System Health Overview
+					</h2>
+					<div class="form-row">
+						<div class="form-group">
+							<label
+								>System Type
+								<span class="required">*</span></label
+							>
+							<select name="systemType" required>
+								<option value="">Select Type</option>
+								<option value="Analog">Analog System</option>
+								<option value="IP">IP System</option>
+								<option value="Hybrid">
+									Hybrid (Analog + IP)
+								</option>
+							</select>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label
+								>Overall System Status
+								<span class="required">*</span></label
+							>
+							<select name="systemStatus" required>
+								<option value="">Select Status</option>
+								<option value="Excellent">Excellent</option>
+								<option value="Good">Good</option>
+								<option value="Needs Attention">
+									Needs Attention
+								</option>
+								<option value="Critical">Critical</option>
+							</select>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label
+								>Network Connectivity Status
+								<span class="required">*</span></label
+							>
+							<select name="networkStatus" required>
+								<option value="">Select Status</option>
+								<option value="Stable">Stable</option>
+								<option value="Intermittent">
+									Intermittent
+								</option>
+								<option value="Issues Detected">
+									Issues Detected
+								</option>
+							</select>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label
+								>Total Cameras in System
+								<span class="required">*</span></label
+							>
+							<input
+								type="number"
+								name="totalCameras"
+								min="0"
+								required
+							/>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label
+								>Cameras Operational
+								<span class="required">*</span></label
+							>
+							<input
+								type="number"
+								name="camerasOperational"
+								min="0"
+								required
+							/>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label>Cameras Requiring Attention</label>
+							<input
+								type="number"
+								name="camerasAttention"
+								readonly
+							/>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label
+								>System Uptime Percentage
+								<span class="required">*</span></label
+							>
+							<input
+								type="number"
+								name="uptime"
+								min="0"
+								max="100"
+								step="0.01"
+								required
+							/>
+							<span class="error-message"
+								>This field is required (0-100)</span
+							>
+						</div>
+						<div class="form-group">
+							<label
+								>Storage Days Remaining
+								<span class="required">*</span></label
+							>
+							<input
+								type="number"
+								name="storageDays"
+								min="0"
+								required
+							/>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group full-width">
+							<label
+								>Recording Storage Used
+								<span class="required">*</span></label
+							>
+							<div class="range-container">
+								<input
+									type="range"
+									name="storageUsed"
+									min="0"
+									max="100"
+									value="50"
+									required
+								/>
+								<span class="range-value"
+									><span id="storageValue">50</span>%</span
+								>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Section 3: Maintenance Activities Completed -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">3</span>
+						Maintenance Activities Completed
+					</h2>
+					<div class="checkbox-group">
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity1"
+								name="activities"
+								value="Camera lens cleaning"
+							/>
+							<label for="activity1">Camera lens cleaning</label>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity2"
+								name="activities"
+								value="Camera housing inspection"
+							/>
+							<label for="activity2"
+								>Camera housing inspection</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity3"
+								name="activities"
+								value="Camera angle/positioning verification"
+							/>
+							<label for="activity3"
+								>Camera angle/positioning verification</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity4"
+								name="activities"
+								value="Recording quality verification"
+							/>
+							<label for="activity4"
+								>Recording quality verification</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity5"
+								name="activities"
+								value="Playback functionality test"
+							/>
+							<label for="activity5"
+								>Playback functionality test</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity6"
+								name="activities"
+								value="Storage device health check"
+							/>
+							<label for="activity6"
+								>Storage device health check</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity7"
+								name="activities"
+								value="Network connection verification"
+							/>
+							<label for="activity7"
+								>Network connection verification</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity8"
+								name="activities"
+								value="Firmware/software updates applied"
+							/>
+							<label for="activity8"
+								>Firmware/software updates applied</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity9"
+								name="activities"
+								value="Power supply inspection"
+							/>
+							<label for="activity9"
+								>Power supply inspection</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity10"
+								name="activities"
+								value="Cable and connection inspection"
+							/>
+							<label for="activity10"
+								>Cable and connection inspection</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity11"
+								name="activities"
+								value="Access control system test"
+							/>
+							<label for="activity11"
+								>Access control system test (if
+								applicable)</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity12"
+								name="activities"
+								value="Remote viewing functionality test"
+							/>
+							<label for="activity12"
+								>Remote viewing functionality test</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity13"
+								name="activities"
+								value="Motion detection calibration"
+							/>
+							<label for="activity13"
+								>Motion detection calibration</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity14"
+								name="activities"
+								value="Night vision verification"
+							/>
+							<label for="activity14"
+								>Night vision verification</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity15"
+								name="activities"
+								value="Weatherproofing inspection"
+							/>
+							<label for="activity15"
+								>Weatherproofing inspection (outdoor
+								cameras)</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity16"
+								name="activities"
+								value="PTZ functions test"
+							/>
+							<label for="activity16"
+								>PTZ (Pan/Tilt/Zoom) functions test</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity17"
+								name="activities"
+								value="Backup power (UPS/Batteries) check"
+							/>
+							<label for="activity17"
+								>Backup power (UPS/Batteries) check</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity18"
+								name="activities"
+								value="Bandwidth usage verification"
+							/>
+							<label for="activity18"
+								>Bandwidth usage verification</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity19"
+								name="activities"
+								value="User permissions review"
+							/>
+							<label for="activity19"
+								>User permissions review</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity20"
+								name="activities"
+								value="System logs audit"
+							/>
+							<label for="activity20"
+								>System logs audit for unusual activities</label
+							>
+						</div>
+						<div class="checkbox-item">
+							<input
+								type="checkbox"
+								id="activity21"
+								name="activities"
+								value="Mounting bracket inspection"
+							/>
+							<label for="activity21"
+								>Mounting bracket/junction box inspection</label
+							>
+						</div>
+					</div>
+				</div>
+
+				<!-- Section 4: Individual Camera Status -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">4</span>
+						Individual Camera Status
+					</h2>
+					<div id="camerasContainer">
+						<!-- Dynamic camera entries will be added here -->
+					</div>
+					<button type="button" class="add-btn" onclick="addCamera()">
+						Add Camera
+					</button>
+				</div>
+
+				<!-- Section 5: Issues Identified & Resolved -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">5</span>
+						Issues Identified & Resolved
+					</h2>
+					<div id="issuesContainer">
+						<!-- Dynamic issue entries will be added here -->
+					</div>
+					<button type="button" class="add-btn" onclick="addIssue()">
+						Add Issue
+					</button>
+				</div>
+
+				<!-- Section 6: Recommendations -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">6</span>
+						Recommendations
+					</h2>
+					<div class="form-row">
+						<div class="form-group full-width">
+							<label>Maintenance Recommendations</label>
+							<textarea name="maintenanceRec" rows="4"></textarea>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group full-width">
+							<label>Upgrade Opportunities</label>
+							<textarea name="upgradeOpp" rows="4"></textarea>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group full-width">
+							<label>System Optimization Suggestions</label>
+							<textarea
+								name="optimizationSug"
+								rows="4"
+							></textarea>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label>Estimated Cost (if applicable)</label>
+							<input
+								type="text"
+								name="estimatedCost"
+								placeholder="$0.00"
+							/>
+						</div>
+						<div class="form-group">
+							<label>Priority Level</label>
+							<select name="priorityLevel">
+								<option value="">Select Priority</option>
+								<option value="Low">Low</option>
+								<option value="Medium">Medium</option>
+								<option value="High">High</option>
+								<option value="Urgent">Urgent</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<!-- Section 7: Storage & Recording Details -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">7</span>
+						Storage & Recording Details
+					</h2>
+					<div class="form-row">
+						<div class="form-group">
+							<label
+								>Total Storage Capacity
+								<span class="required">*</span></label
+							>
+							<input
+								type="text"
+								name="storageCapacity"
+								placeholder="e.g., 2TB"
+								required
+							/>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label
+								>Current Storage Used
+								<span class="required">*</span></label
+							>
+							<input
+								type="text"
+								name="storageCurrentlyUsed"
+								placeholder="e.g., 1.2TB"
+								required
+							/>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label
+								>Recording Retention Period (days)
+								<span class="required">*</span></label
+							>
+							<input
+								type="number"
+								name="retentionPeriod"
+								min="0"
+								required
+							/>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label
+								>Video Quality Settings
+								<span class="required">*</span></label
+							>
+							<select name="videoQuality" required>
+								<option value="">Select Quality</option>
+								<option value="4K">4K</option>
+								<option value="1080p">1080p</option>
+								<option value="720p">720p</option>
+								<option value="Custom">Custom</option>
+							</select>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label
+								>Backup Status
+								<span class="required">*</span></label
+							>
+							<select name="backupStatus" required>
+								<option value="">Select Status</option>
+								<option value="Active">Active</option>
+								<option value="Not Configured">
+									Not Configured
+								</option>
+								<option value="Failed">Failed</option>
+							</select>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+					</div>
+				</div>
+
+				<!-- Section 8: System Updates -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">8</span>
+						System Updates
+					</h2>
+					<div class="form-row">
+						<div class="form-group">
+							<label>Current Firmware Version</label>
+							<input type="text" name="firmwareVersion" />
+						</div>
+						<div class="form-group">
+							<label>Current Software Version</label>
+							<input type="text" name="softwareVersion" />
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group full-width">
+							<label>Updates Applied This Month</label>
+							<textarea name="updatesApplied" rows="3"></textarea>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group full-width">
+							<label>Updates Recommended</label>
+							<textarea
+								name="updatesRecommended"
+								rows="3"
+							></textarea>
+						</div>
+					</div>
+				</div>
+
+				<!-- Section 9: Parts Used -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">9</span>
+						Parts Used / Required
+					</h2>
+					<div id="partsContainer">
+						<!-- Dynamic parts entries will be added here -->
+					</div>
+					<button type="button" class="add-btn" onclick="addPart()">
+						Add Part
+					</button>
+				</div>
+
+				<!-- Section 10: Summary -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">10</span>
+						Summary
+					</h2>
+					<div class="form-row">
+						<div class="form-group full-width">
+							<label
+								>Overall Assessment
+								<span class="required">*</span></label
+							>
+							<textarea
+								name="overallAssessment"
+								rows="4"
+								required
+							></textarea>
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group full-width">
+							<label
+								>Critical Items Requiring Immediate
+								Attention</label
+							>
+							<textarea name="criticalItems" rows="3"></textarea>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group full-width">
+							<label>Next Month's Focus Areas</label>
+							<textarea name="focusAreas" rows="3"></textarea>
+						</div>
+					</div>
+				</div>
+
+				<!-- Section 10: Sign-off -->
+				<div class="form-section">
+					<h2 class="section-title">
+						<span class="section-number">10</span>
+						Sign-off
+					</h2>
+					<div class="form-row">
+						<div class="form-group">
+							<label
+								>Technician Signature/Name
+								<span class="required">*</span></label
+							>
+							<input type="text" name="techSignature" required />
+							<span class="error-message"
+								>This field is required</span
+							>
+						</div>
+						<div class="form-group">
+							<label>Client Acknowledgment Name (optional)</label>
+							<input type="text" name="clientAck" />
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group full-width">
+							<label>Client Notes/Feedback (optional)</label>
+							<textarea name="clientFeedback" rows="3"></textarea>
+						</div>
+					</div>
+				</div>
+
+				<!-- Action Buttons -->
+				<div class="action-buttons">
+					<button
+						type="button"
+						class="btn btn-primary"
+						onclick="generatePDF()"
+					>
+						Generate PDF
+					</button>
+					<button
+						type="button"
+						class="btn btn-secondary"
+						onclick="saveFormData()"
+					>
+						Save Progress
+					</button>
+					<button
+						type="button"
+						class="btn btn-danger"
+						onclick="showClearConfirmation()"
+					>
+						Clear Form
+					</button>
+				</div>
+			</form>
+		</div>
+
+		<!-- Restore Session Modal -->
+		<div id="restoreModal" class="modal">
+			<div class="modal-content">
+				<div class="modal-header">Restore Previous Session?</div>
+				<div class="modal-body">
+					We found a previously saved report. Would you like to
+					restore it and continue where you left off?
+				</div>
+				<div class="modal-buttons">
+					<button
+						class="btn btn-secondary"
+						onclick="closeRestoreModal()"
+					>
+						Start Fresh
+					</button>
+					<button class="btn btn-primary" onclick="restoreSession()">
+						Restore
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Clear Confirmation Modal -->
+		<div id="clearModal" class="modal">
+			<div class="modal-content">
+				<div class="modal-header">Clear All Data?</div>
+				<div class="modal-body">
+					Are you sure you want to clear all form data? This action
+					cannot be undone.
+				</div>
+				<div class="modal-buttons">
+					<button
+						class="btn btn-secondary"
+						onclick="closeClearModal()"
+					>
+						Cancel
+					</button>
+					<button class="btn btn-danger" onclick="clearForm()">
+						Clear All
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// Global variables
+			let cameraCount = 0;
+			let issueCount = 0;
+			let partCount = 0;
+			let autoSaveInterval;
+
+			// Initialize on page load
+			document.addEventListener("DOMContentLoaded", function () {
+				// Preload logo
+				const logoImg = document.getElementById("logo-img");
+				logoImg.onload = function () {
+					console.log("Logo loaded successfully");
+				};
+				logoImg.onerror = function () {
+					console.error("Failed to load logo from:", logoImg.src);
+				};
+
+				// Populate year dropdown (current year - 1 to current year + 5)
+				const currentYear = new Date().getFullYear();
+				const yearSelect = document.getElementById("reportMonth_year");
+				for (
+					let year = currentYear - 1;
+					year <= currentYear + 5;
+					year++
+				) {
+					const option = document.createElement("option");
+					option.value = year;
+					option.textContent = year;
+					if (year === currentYear) {
+						option.selected = true;
+					}
+					yearSelect.appendChild(option);
+				}
+
+				// Set current month as default
+				const currentMonth = String(new Date().getMonth() + 1).padStart(
+					2,
+					"0",
+				);
+				document.getElementById("reportMonth_month").value =
+					currentMonth;
+
+				// Combine month/year into hidden field
+				function updateReportMonth() {
+					const month =
+						document.getElementById("reportMonth_month").value;
+					const year =
+						document.getElementById("reportMonth_year").value;
+					if (month && year) {
+						document.getElementById("reportMonth_hidden").value =
+							`${year}-${month}`;
+					}
+				}
+
+				document
+					.getElementById("reportMonth_month")
+					.addEventListener("change", updateReportMonth);
+				document
+					.getElementById("reportMonth_year")
+					.addEventListener("change", updateReportMonth);
+				updateReportMonth(); // Initialize
+
+				// Set default service date to today
+				const today = new Date().toISOString().split("T")[0];
+				const serviceDateField = document.querySelector(
+					'[name="serviceDate"]',
+				);
+				if (serviceDateField) {
+					serviceDateField.value = today;
+				}
+
+				// Check for saved data
+				if (localStorage.getItem("reportData")) {
+					document.getElementById("restoreModal").style.display =
+						"block";
+				} else {
+					// Add initial camera and issue
+					addCamera();
+					addIssue();
+				}
+
+				// Set up auto-save
+				autoSaveInterval = setInterval(autoSave, 30000); // Every 30 seconds
+
+				// Add event listeners for auto-save on blur
+				const inputs = document.querySelectorAll(
+					"input, select, textarea",
+				);
+				inputs.forEach((input) => {
+					input.addEventListener("blur", autoSave);
+				});
+
+				// Update storage slider value display
+				const storageSlider = document.querySelector(
+					'[name="storageUsed"]',
+				);
+				if (storageSlider) {
+					storageSlider.addEventListener("input", function () {
+						document.getElementById("storageValue").textContent =
+							this.value;
+					});
+				}
+
+				// Auto-calculate cameras requiring attention
+				const totalCamerasInput = document.querySelector(
+					'[name="totalCameras"]',
+				);
+				const operationalCamerasInput = document.querySelector(
+					'[name="camerasOperational"]',
+				);
+
+				function updateCamerasAttention() {
+					const total = parseInt(totalCamerasInput.value) || 0;
+					const operational =
+						parseInt(operationalCamerasInput.value) || 0;
+					document.querySelector('[name="camerasAttention"]').value =
+						Math.max(0, total - operational);
+					updateProgress();
+				}
+
+				totalCamerasInput.addEventListener(
+					"input",
+					updateCamerasAttention,
+				);
+				operationalCamerasInput.addEventListener(
+					"input",
+					updateCamerasAttention,
+				);
+
+				// Update progress on any form change
+				document
+					.getElementById("maintenanceForm")
+					.addEventListener("input", updateProgress);
+				document
+					.getElementById("maintenanceForm")
+					.addEventListener("change", updateProgress);
+
+				// Initial progress update
+				updateProgress();
+			});
+
+			// Add Camera
+			function addCamera() {
+				cameraCount++;
+				const container = document.getElementById("camerasContainer");
+				const cameraDiv = document.createElement("div");
+				cameraDiv.className = "dynamic-item";
+				cameraDiv.id = `camera-${cameraCount}`;
+				cameraDiv.innerHTML = `
                 <div class="dynamic-item-header">
                     <span class="item-number">Camera #${cameraCount}</span>
                     <button type="button" class="remove-btn" onclick="removeCamera(${cameraCount})">Remove</button>
@@ -602,6 +1705,15 @@
                             <option value="Operational">Operational</option>
                             <option value="Needs Attention">Needs Attention</option>
                             <option value="Offline">Offline</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Image Quality</label>
+                        <select name="camera_${cameraCount}_quality">
+                            <option value="">Select Quality</option>
+                            <option value="Good">Good</option>
+                            <option value="Fair">Fair</option>
+                            <option value="Poor">Poor</option>
                         </select>
                     </div>
                 </div>
@@ -624,27 +1736,27 @@
                     </div>
                 </div>
             `;
-            container.appendChild(cameraDiv);
-            updateProgress();
-        }
+				container.appendChild(cameraDiv);
+				updateProgress();
+			}
 
-        // Remove Camera
-        function removeCamera(id) {
-            const element = document.getElementById(`camera-${id}`);
-            if (element) {
-                element.remove();
-                updateProgress();
-            }
-        }
+			// Remove Camera
+			function removeCamera(id) {
+				const element = document.getElementById(`camera-${id}`);
+				if (element) {
+					element.remove();
+					updateProgress();
+				}
+			}
 
-        // Add Issue
-        function addIssue() {
-            issueCount++;
-            const container = document.getElementById('issuesContainer');
-            const issueDiv = document.createElement('div');
-            issueDiv.className = 'dynamic-item';
-            issueDiv.id = `issue-${issueCount}`;
-            issueDiv.innerHTML = `
+			// Add Issue
+			function addIssue() {
+				issueCount++;
+				const container = document.getElementById("issuesContainer");
+				const issueDiv = document.createElement("div");
+				issueDiv.className = "dynamic-item";
+				issueDiv.id = `issue-${issueCount}`;
+				issueDiv.innerHTML = `
                 <div class="dynamic-item-header">
                     <span class="item-number">Issue #${issueCount}</span>
                     <button type="button" class="remove-btn" onclick="removeIssue(${issueCount})">Remove</button>
@@ -678,1067 +1790,1278 @@
                     </div>
                 </div>
             `;
-            container.appendChild(issueDiv);
-            updateProgress();
-        }
-
-        // Remove Issue
-        function removeIssue(id) {
-            const element = document.getElementById(`issue-${id}`);
-            if (element) {
-                element.remove();
-                updateProgress();
-            }
-        }
-
-        // Update Progress
-        function updateProgress() {
-            const form = document.getElementById('maintenanceForm');
-            const requiredFields = form.querySelectorAll('[required]');
-            let filledCount = 0;
-
-            requiredFields.forEach(field => {
-                if (field.type === 'checkbox') {
-                    // For checkboxes, check if any in the group are checked
-                    const checkboxes = form.querySelectorAll('[name="' + field.name + '"]');
-                    const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-                    if (anyChecked) filledCount++;
-                } else if (field.value.trim() !== '') {
-                    filledCount++;
-                }
-            });
-
-            const percentage = Math.round((filledCount / requiredFields.length) * 100);
-            document.getElementById('progressFill').style.width = percentage + '%';
-            document.getElementById('progressText').textContent = percentage + '%';
-        }
-
-        // Save Form Data
-        function saveFormData() {
-            const formData = getFormData();
-            localStorage.setItem('reportData', JSON.stringify(formData));
-            localStorage.setItem('lastSaved', new Date().toISOString());
-            updateLastSavedDisplay();
-            showSaveIndicator();
-        }
-
-        // Auto-save
-        function autoSave() {
-            saveFormData();
-        }
-
-        // Get Form Data
-        function getFormData() {
-            const form = document.getElementById('maintenanceForm');
-            const formData = new FormData(form);
-            const data = {};
-
-            // Get all form elements
-            for (let [key, value] of formData.entries()) {
-                if (data[key]) {
-                    // Handle multiple values (checkboxes)
-                    if (Array.isArray(data[key])) {
-                        data[key].push(value);
-                    } else {
-                        data[key] = [data[key], value];
-                    }
-                } else {
-                    data[key] = value;
-                }
-            }
-
-            // Get all checkboxes (including unchecked)
-            const checkboxes = form.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                if (!data[cb.name]) {
-                    data[cb.name] = [];
-                }
-            });
-
-            // Store counts for dynamic sections
-            data.cameraCount = cameraCount;
-            data.issueCount = issueCount;
-
-            return data;
-        }
-
-        // Validate and parse a month string (YYYY-MM format)
-        function parseMonthString(monthString) {
-            if (!monthString || typeof monthString !== 'string') {
-                return null;
-            }
-            // Check format: YYYY-MM
-            const match = monthString.match(/^(\d{4})-(\d{2})$/);
-            if (!match) {
-                return null;
-            }
-            const year = parseInt(match[1], 10);
-            const month = parseInt(match[2], 10);
-            // Validate year and month ranges
-            if (year < 1900 || year > 2100 || month < 1 || month > 12) {
-                return null;
-            }
-            const date = new Date(monthString + '-01');
-            // Check if the date is valid
-            if (isNaN(date.getTime())) {
-                return null;
-            }
-            return date;
-        }
-
-        // Set Form Data
-        function setFormData(data) {
-            const form = document.getElementById('maintenanceForm');
-
-            // Restore camera and issue counts
-            if (data.cameraCount) {
-                for (let i = 1; i <= data.cameraCount; i++) {
-                    if (data[`camera_${i}_location`] !== undefined) {
-                        addCamera();
-                    }
-                }
-            }
-
-            if (data.issueCount) {
-                for (let i = 1; i <= data.issueCount; i++) {
-                    if (data[`issue_${i}_description`] !== undefined) {
-                        addIssue();
-                    }
-                }
-            }
-
-            // Populate form fields
-            for (let key in data) {
-                const element = form.querySelector(`[name="${key}"]`);
-                if (element) {
-                    if (element.type === 'checkbox') {
-                        const checkboxes = form.querySelectorAll(`[name="${key}"]`);
-                        const values = Array.isArray(data[key]) ? data[key] : [data[key]];
-                        checkboxes.forEach(cb => {
-                            cb.checked = values.includes(cb.value);
-                        });
-                    } else {
-                        element.value = data[key];
-                    }
-                }
-            }
-
-            // Restore month/year dropdowns from saved reportMonth value
-            if (data.reportMonth) {
-                const match = data.reportMonth.match(/^(\d{4})-(\d{2})$/);
-                if (match) {
-                    const monthSelect = document.getElementById('reportMonthSelect');
-                    const yearSelect = document.getElementById('reportYearSelect');
-                    if (monthSelect && yearSelect) {
-                        yearSelect.value = match[1];
-                        monthSelect.value = match[2];
-                    }
-                }
-            }
-
-            updateProgress();
-        }
-
-        // Show Save Indicator
-        function showSaveIndicator() {
-            const indicator = document.getElementById('saveIndicator');
-            indicator.classList.add('show');
-            setTimeout(() => {
-                indicator.classList.remove('show');
-            }, 2000);
-        }
-
-        // Update Last Saved Display
-        function updateLastSavedDisplay() {
-            const lastSaved = localStorage.getItem('lastSaved');
-            if (lastSaved) {
-                const date = new Date(lastSaved);
-                const now = new Date();
-                const diff = Math.floor((now - date) / 1000); // seconds
-
-                let displayText;
-                if (diff < 60) {
-                    displayText = 'Just now';
-                } else if (diff < 3600) {
-                    const minutes = Math.floor(diff / 60);
-                    displayText = `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-                } else {
-                    displayText = date.toLocaleString();
-                }
-
-                document.getElementById('lastSaved').textContent = displayText;
-            }
-        }
-
-        // Update last saved display every minute
-        setInterval(updateLastSavedDisplay, 60000);
-
-        // Restore Session
-        function restoreSession() {
-            const savedData = localStorage.getItem('reportData');
-            if (savedData) {
-                try {
-                    const data = JSON.parse(savedData);
-                    setFormData(data);
-                    updateLastSavedDisplay();
-                } catch (error) {
-                    console.error('Error parsing saved data:', error);
-                    alert('Error restoring saved data. The saved data may be corrupted.');
-                    localStorage.removeItem('reportData');
-                    localStorage.removeItem('lastSaved');
-                }
-            }
-            closeRestoreModal();
-        }
-
-        // Close Restore Modal
-        function closeRestoreModal() {
-            document.getElementById('restoreModal').style.display = 'none';
-            // Add initial camera and issue if starting fresh
-            if (cameraCount === 0) addCamera();
-            if (issueCount === 0) addIssue();
-        }
-
-        // Show Clear Confirmation
-        function showClearConfirmation() {
-            document.getElementById('clearModal').style.display = 'block';
-        }
-
-        // Close Clear Modal
-        function closeClearModal() {
-            document.getElementById('clearModal').style.display = 'none';
-        }
-
-        // Clear Form
-        function clearForm() {
-            if (confirm('Are you absolutely sure? This will delete all data permanently.')) {
-                document.getElementById('maintenanceForm').reset();
-                localStorage.removeItem('reportData');
-                localStorage.removeItem('lastSaved');
-
-                // Clear dynamic sections
-                document.getElementById('camerasContainer').innerHTML = '';
-                document.getElementById('issuesContainer').innerHTML = '';
-                cameraCount = 0;
-                issueCount = 0;
-
-                // Add initial items
-                addCamera();
-                addIssue();
-
-                // Reset displays
-                document.getElementById('lastSaved').textContent = 'Never';
-                updateProgress();
-                closeClearModal();
-            }
-        }
-
-        // Validate Form
-        function validateForm() {
-            const form = document.getElementById('maintenanceForm');
-            const requiredFields = form.querySelectorAll('[required]');
-            let isValid = true;
-            let errorMessages = [];
-
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.classList.add('error');
-                    isValid = false;
-                } else {
-                    field.classList.remove('error');
-                }
-            });
-
-            // Validate date fields specifically
-            const reportMonthField = form.querySelector('[name="reportMonth"]');
-            const monthSelect = document.getElementById('reportMonthSelect');
-            const yearSelect = document.getElementById('reportYearSelect');
-
-            if (reportMonthField && reportMonthField.value) {
-                const date = parseMonthString(reportMonthField.value);
-                if (!date) {
-                    // Apply error class to dropdowns instead of hidden field
-                    if (monthSelect) monthSelect.classList.add('error');
-                    if (yearSelect) yearSelect.classList.add('error');
-                    isValid = false;
-                    errorMessages.push('Report month has an invalid date format');
-                }
-            } else if (!reportMonthField.value) {
-                // If hidden field is empty, ensure dropdowns show error
-                if (monthSelect && !monthSelect.value) monthSelect.classList.add('error');
-                if (yearSelect && !yearSelect.value) yearSelect.classList.add('error');
-            }
-
-            if (!isValid) {
-                let alertMessage = 'Please fill in all required fields (marked with *)';
-                if (errorMessages.length > 0) {
-                    alertMessage += '\n\n' + errorMessages.join('\n');
-                }
-                alert(alertMessage);
-                // Scroll to first error
-                const firstError = form.querySelector('.error');
-                if (firstError) {
-                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
-
-            return isValid;
-        }
-
-        // Generate PDF
-        function generatePDF() {
-            if (!validateForm()) {
-                return;
-            }
-
-            // Show loading indicator
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = 'Generating PDF<span class="spinner"></span>';
-            btn.disabled = true;
-
-            try {
-                const formData = getFormData();
-
-                // Generate filename
-                const clientNameClean = (formData.clientName || 'Client').replace(/[^a-zA-Z0-9]/g, '');
-                let monthYear = 'Report';
-                if (formData.reportMonth) {
-                    const date = parseMonthString(formData.reportMonth);
-                    if (date) {
-                        monthYear = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).replace(' ', '');
-                    }
-                }
-                const filename = `${clientNameClean}_MaintenanceReport_${monthYear}.pdf`;
-
-                // Create HTML content for PDF
-                const pdfContent = createPDFTemplate(formData);
-
-                // Configure html2pdf options
-                const opt = {
-                    margin: [10, 10, 10, 10],
-                    filename: filename,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                };
-
-                // Generate PDF - Create a temporary container element for proper rendering
-                const tempContainer = document.createElement('div');
-                tempContainer.innerHTML = pdfContent;
-                tempContainer.style.position = 'absolute';
-                tempContainer.style.left = '-9999px';
-                tempContainer.style.top = '0';
-                document.body.appendChild(tempContainer);
-
-                html2pdf().set(opt).from(tempContainer).save().then(() => {
-                    document.body.removeChild(tempContainer);
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    alert('PDF generated successfully!');
-                }).catch(error => {
-                    console.error('Error generating PDF:', error);
-                    alert('Error generating PDF. Please check the console for details.');
-                    if (document.body.contains(tempContainer)) {
-                        document.body.removeChild(tempContainer);
-                    }
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                });
-
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                alert('Error generating PDF. Please check the console for details.');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        // Create PDF HTML Template with vanilla CSS styling
-        function createPDFTemplate(data) {
-            let reportPeriod = 'N/A';
-            if (data.reportMonth) {
-                const date = parseMonthString(data.reportMonth);
-                if (date) {
-                    reportPeriod = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                }
-            }
-
-            // Get activities array
-            const activities = data.activities ? (Array.isArray(data.activities) ? data.activities : [data.activities]) : [];
-
-            // Get status badge class
-            const getStatusClass = (status) => {
-                const statusMap = {
-                    'Excellent': 'pdf-badge-excellent',
-                    'Good': 'pdf-badge-good',
-                    'Operational': 'pdf-badge-operational',
-                    'Stable': 'pdf-badge-stable',
-                    'Active': 'pdf-badge-active',
-                    'Needs Attention': 'pdf-badge-needs-attention',
-                    'Intermittent': 'pdf-badge-intermittent',
-                    'Critical': 'pdf-badge-critical',
-                    'Offline': 'pdf-badge-offline',
-                    'Issues Detected': 'pdf-badge-issues-detected',
-                    'Failed': 'pdf-badge-failed',
-                    'Not Configured': 'pdf-badge-not-configured'
-                };
-                return 'pdf-badge ' + (statusMap[status] || '');
-            };
-
-            const getSeverityClass = (severity) => {
-                const severityMap = {
-                    'Critical': 'pdf-badge-severity-critical',
-                    'High': 'pdf-badge-severity-high',
-                    'Medium': 'pdf-badge-severity-medium',
-                    'Low': 'pdf-badge-severity-low'
-                };
-                return 'pdf-badge ' + (severityMap[severity] || '');
-            };
-
-            // Build cameras HTML
-            let camerasHTML = '';
-            let cameraFound = false;
-            for (let i = 1; i <= data.cameraCount; i++) {
-                const location = data[`camera_${i}_location`];
-                if (location) {
-                    cameraFound = true;
-                    const status = data[`camera_${i}_status`];
-                    const issues = data[`camera_${i}_issues`];
-                    const actions = data[`camera_${i}_actions`];
-                    const notes = data[`camera_${i}_notes`];
-
-                    camerasHTML += `
-                        <div class="pdf-camera-item">
-                            <div class="pdf-camera-header">
-                                <h4 class="pdf-camera-title">📷 Camera #${i}: ${location}</h4>
-                                ${status ? `<span class="${getStatusClass(status)}">${status}</span>` : ''}
-                            </div>
-                            ${issues ? `<div class="pdf-info-row"><span class="pdf-info-label">Issues:</span> <span class="pdf-info-value">${issues}</span></div>` : ''}
-                            ${actions ? `<div class="pdf-info-row"><span class="pdf-info-label">Actions:</span> <span class="pdf-info-value">${actions}</span></div>` : ''}
-                            ${notes ? `<div class="pdf-info-row"><span class="pdf-info-label">Notes:</span> <span class="pdf-info-value">${notes}</span></div>` : ''}
-                        </div>
-                    `;
-                }
-            }
-            if (!cameraFound) {
-                camerasHTML = '<p class="pdf-no-data">No camera details recorded</p>';
-            }
-
-            // Build issues HTML
-            let issuesHTML = '';
-            let issueFound = false;
-            for (let i = 1; i <= data.issueCount; i++) {
-                const description = data[`issue_${i}_description`];
-                if (description) {
-                    issueFound = true;
-                    const severity = data[`issue_${i}_severity`];
-                    const resolution = data[`issue_${i}_resolution`];
-                    const parts = data[`issue_${i}_parts`];
-
-                    issuesHTML += `
-                        <div class="pdf-issue-item">
-                            <div class="pdf-issue-header">
-                                <h4 class="pdf-issue-title">⚠ Issue #${i}</h4>
-                                ${severity ? `<span class="${getSeverityClass(severity)}">${severity}</span>` : ''}
-                            </div>
-                            <div class="pdf-info-row"><span class="pdf-info-label">Description:</span> <span class="pdf-info-value">${description}</span></div>
-                            ${resolution ? `<div class="pdf-info-row"><span class="pdf-info-label">Resolution:</span> <span class="pdf-issue-resolution">${resolution}</span></div>` : ''}
-                            ${parts ? `<div class="pdf-info-row"><span class="pdf-info-label">Parts:</span> <span class="pdf-info-value">${parts}</span></div>` : ''}
-                        </div>
-                    `;
-                }
-            }
-            if (!issueFound) {
-                issuesHTML = '<p class="pdf-no-data">No issues recorded</p>';
-            }
-
-            return `
-                <style>
-                    /* PDF Container */
-                    .pdf-container {
-                        font-family: 'Barlow', sans-serif;
-                        font-size: 11px;
-                        line-height: 1.6;
-                        color: #333;
-                    }
-
-                    /* PDF Layout */
-                    .pdf-cover-page {
-                        page-break-after: always;
-                    }
-
-                    .pdf-cover-header {
-                        background: linear-gradient(to bottom, #09332C, #2E4B3C, #F0531C);
-                        color: white;
-                        padding: 80px 32px;
-                        text-align: center;
-                    }
-
-                    .pdf-cover-title {
-                        font-size: 48px;
-                        font-weight: 700;
-                        letter-spacing: 2px;
-                        margin-bottom: 8px;
-                    }
-
-                    .pdf-cover-subtitle {
-                        font-size: 36px;
-                        font-weight: 700;
-                        letter-spacing: 2px;
-                        margin-bottom: 16px;
-                    }
-
-                    .pdf-cover-tagline {
-                        font-size: 18px;
-                        font-style: italic;
-                        margin-bottom: 24px;
-                    }
-
-                    .pdf-cover-divider {
-                        width: 50%;
-                        height: 4px;
-                        background-color: white;
-                        margin: 0 auto;
-                    }
-
-                    .pdf-cover-info-box {
-                        margin: 48px 32px 0;
-                        padding: 24px;
-                        border: 2px solid #09332C;
-                        border-radius: 8px;
-                        background-color: white;
-                    }
-
-                    .pdf-cover-report-title {
-                        font-size: 24px;
-                        font-weight: 700;
-                        color: #09332C;
-                        text-align: center;
-                        margin-bottom: 8px;
-                    }
-
-                    .pdf-cover-report-subtitle {
-                        font-size: 20px;
-                        font-weight: 700;
-                        color: #09332C;
-                        text-align: center;
-                    }
-
-                    .pdf-cover-client-box {
-                        margin: 32px;
-                        padding: 24px;
-                        background-color: #F7EDDA;
-                        border-radius: 8px;
-                    }
-
-                    .pdf-cover-client-label {
-                        font-weight: 700;
-                        color: #2E4B3C;
-                        font-size: 13px;
-                        margin-bottom: 4px;
-                    }
-
-                    .pdf-cover-client-value {
-                        color: #333333;
-                        font-size: 16px;
-                    }
-
-                    .pdf-cover-footer {
-                        position: absolute;
-                        bottom: 32px;
-                        left: 0;
-                        right: 0;
-                        text-align: center;
-                        color: #2E4B3C;
-                        font-size: 11px;
-                    }
-
-                    /* PDF Content Sections */
-                    .pdf-content {
-                        padding: 24px;
-                    }
-
-                    .pdf-section {
-                        margin-bottom: 24px;
-                        page-break-inside: avoid;
-                    }
-
-                    .pdf-section-header {
-                        background-color: #09332C;
-                        color: white;
-                        padding: 8px 16px;
-                        border-radius: 8px;
-                        margin-bottom: 12px;
-                    }
-
-                    .pdf-section-title {
-                        font-size: 16px;
-                        font-weight: 700;
-                    }
-
-                    .pdf-info-box {
-                        background-color: #F7EDDA;
-                        padding: 16px;
-                        border-radius: 8px;
-                        border: 1px solid #dddddd;
-                        margin-bottom: 12px;
-                    }
-
-                    .pdf-info-row {
-                        margin-bottom: 8px;
-                    }
-
-                    .pdf-info-row:last-child {
-                        margin-bottom: 0;
-                    }
-
-                    .pdf-info-label {
-                        font-weight: 600;
-                        color: #2E4B3C;
-                        font-size: 13px;
-                    }
-
-                    .pdf-info-value {
-                        color: #333333;
-                        font-size: 13px;
-                    }
-
-                    /* PDF Status Badges */
-                    .pdf-badge {
-                        display: inline-block;
-                        padding: 4px 12px;
-                        border-radius: 12px;
-                        font-size: 11px;
-                        font-weight: 700;
-                    }
-
-                    .pdf-badge-excellent,
-                    .pdf-badge-operational,
-                    .pdf-badge-stable,
-                    .pdf-badge-active {
-                        background-color: #16a34a;
-                        color: white;
-                    }
-
-                    .pdf-badge-good {
-                        background-color: #3b82f6;
-                        color: white;
-                    }
-
-                    .pdf-badge-needs-attention,
-                    .pdf-badge-intermittent {
-                        background-color: #FFA74F;
-                        color: white;
-                    }
-
-                    .pdf-badge-critical,
-                    .pdf-badge-offline,
-                    .pdf-badge-issues-detected,
-                    .pdf-badge-failed {
-                        background-color: #dc2626;
-                        color: white;
-                    }
-
-                    .pdf-badge-not-configured {
-                        background-color: #6b7280;
-                        color: white;
-                    }
-
-                    .pdf-badge-severity-critical {
-                        background-color: #dc2626;
-                        color: white;
-                    }
-
-                    .pdf-badge-severity-high {
-                        background-color: #FFA74F;
-                        color: white;
-                    }
-
-                    .pdf-badge-severity-medium {
-                        background-color: #eab308;
-                        color: #1f2937;
-                    }
-
-                    .pdf-badge-severity-low {
-                        background-color: #3b82f6;
-                        color: white;
-                    }
-
-                    /* PDF Status Flex Layout */
-                    .pdf-flex {
-                        display: flex;
-                    }
-
-                    .pdf-flex-center {
-                        display: flex;
-                        align-items: center;
-                    }
-
-                    .pdf-flex-between {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    }
-
-                    .pdf-flex-gap {
-                        gap: 12px;
-                    }
-
-                    .pdf-flex-gap-small {
-                        gap: 8px;
-                    }
-
-                    /* PDF Spacing */
-                    .pdf-mb-1 { margin-bottom: 4px; }
-                    .pdf-mb-2 { margin-bottom: 8px; }
-                    .pdf-mb-3 { margin-bottom: 12px; }
-                    .pdf-mb-4 { margin-bottom: 16px; }
-                    .pdf-mb-6 { margin-bottom: 24px; }
-                    .pdf-mt-3 { margin-top: 12px; }
-
-                    /* PDF Camera Item */
-                    .pdf-camera-item {
-                        margin-bottom: 16px;
-                        padding: 16px;
-                        border: 2px solid #09332C;
-                        border-radius: 8px;
-                        background-color: #F7EDDA;
-                        page-break-inside: avoid;
-                    }
-
-                    .pdf-camera-header {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        margin-bottom: 12px;
-                    }
-
-                    .pdf-camera-title {
-                        font-size: 16px;
-                        font-weight: 700;
-                        color: #09332C;
-                    }
-
-                    /* PDF Issue Item */
-                    .pdf-issue-item {
-                        margin-bottom: 16px;
-                        padding: 16px;
-                        border: 2px solid #FFA74F;
-                        border-radius: 8px;
-                        background-color: #fff7ed;
-                        page-break-inside: avoid;
-                    }
-
-                    .pdf-issue-header {
-                        display: flex;
-                        align-items: center;
-                        gap: 12px;
-                        margin-bottom: 12px;
-                    }
-
-                    .pdf-issue-title {
-                        font-size: 16px;
-                        font-weight: 700;
-                        color: #dc2626;
-                    }
-
-                    .pdf-issue-resolution {
-                        color: #15803d;
-                        font-size: 13px;
-                    }
-
-                    /* PDF Activities Grid */
-                    .pdf-activities-grid {
-                        display: grid;
-                        grid-template-columns: repeat(2, 1fr);
-                        gap: 12px;
-                    }
-
-                    .pdf-activity-item {
-                        display: flex;
-                        align-items: flex-start;
-                        gap: 8px;
-                    }
-
-                    .pdf-activity-checkmark {
-                        width: 20px;
-                        height: 20px;
-                        background-color: #16a34a;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-size: 11px;
-                        flex-shrink: 0;
-                        margin-top: 2px;
-                    }
-
-                    .pdf-activity-text {
-                        color: #333333;
-                        font-size: 13px;
-                    }
-
-                    /* PDF No Data */
-                    .pdf-no-data {
-                        color: #2E4B3C;
-                        font-style: italic;
-                        font-size: 13px;
-                        margin-left: 8px;
-                    }
-
-                    /* PDF Critical Alert Box */
-                    .pdf-critical-box {
-                        padding: 16px;
-                        background-color: #fee2e2;
-                        border: 2px solid #dc2626;
-                        border-radius: 8px;
-                    }
-
-                    .pdf-critical-title {
-                        font-weight: 700;
-                        color: #dc2626;
-                        font-size: 13px;
-                        margin-bottom: 8px;
-                    }
-
-                    /* PDF Sign-off Box */
-                    .pdf-signoff-box {
-                        background-color: #F7EDDA;
-                        padding: 16px;
-                        border-radius: 8px;
-                        border: 1px solid #09332C;
-                    }
-
-                    .pdf-signoff-value {
-                        color: #09332C;
-                        font-weight: 500;
-                    }
-
-                    /* PDF Utility Classes */
-                    .pdf-text-white { color: white; }
-                    .pdf-text-gray { color: #2E4B3C; }
-                    .pdf-text-dark { color: #333333; }
-                    .pdf-text-sm { font-size: 13px; }
-                    .pdf-text-xs { font-size: 11px; }
-
-                    .pdf-font-bold { font-weight: 700; }
-                    .pdf-font-semibold { font-weight: 600; }
-
-                    .pdf-italic { font-style: italic; }
-
-                    .pdf-space-y-2 > * + * { margin-top: 8px; }
-                    .pdf-space-y-3 > * + * { margin-top: 12px; }
-                </style>
-                <div class="pdf-container">
-                    <!-- Cover Page -->
-                    <div class="pdf-cover-page">
-                        <div class="pdf-cover-header">
-                            <h1 class="pdf-cover-title">ZONEBRITE</h1>
-                            <h2 class="pdf-cover-subtitle">SOLUTIONS</h2>
-                            <p class="pdf-cover-tagline">Protecting What Matters Most</p>
-                            <div class="pdf-cover-divider"></div>
-                        </div>
-
-                        <div class="pdf-cover-info-box">
-                            <h3 class="pdf-cover-report-title">MONTHLY MAINTENANCE</h3>
-                            <h3 class="pdf-cover-report-subtitle">REPORT</h3>
-                        </div>
-
-                        <div class="pdf-cover-client-box">
-                            <div class="pdf-mb-4">
-                                <p class="pdf-cover-client-label">CLIENT:</p>
-                                <p class="pdf-cover-client-value">${data.clientName || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <p class="pdf-cover-client-label">REPORT PERIOD:</p>
-                                <p class="pdf-cover-client-value">${reportPeriod}</p>
-                            </div>
-                        </div>
-
-                        <div class="pdf-cover-footer">
-                            <p>Generated on: ${new Date().toLocaleDateString()}</p>
-                            <p>Zonebrite Solutions | Phone: Contact for details</p>
-                            <p>Email: info@zonebrite.com | www.zonebrite.com</p>
-                        </div>
+				container.appendChild(issueDiv);
+				updateProgress();
+			}
+
+			// Remove Issue
+			function removeIssue(id) {
+				const element = document.getElementById(`issue-${id}`);
+				if (element) {
+					element.remove();
+					updateProgress();
+				}
+			}
+
+			// Add Part
+			function addPart() {
+				partCount++;
+				const container = document.getElementById("partsContainer");
+				const partDiv = document.createElement("div");
+				partDiv.className = "dynamic-item";
+				partDiv.id = `part-${partCount}`;
+				partDiv.innerHTML = `
+                <div class="dynamic-item-header">
+                    <span class="item-number">Part #${partCount}</span>
+                    <button type="button" class="remove-btn" onclick="removePart(${partCount})">Remove</button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Part Description</label>
+                        <input type="text" name="part_${partCount}_description">
                     </div>
-
-                    <!-- Content Pages -->
-                    <div class="pdf-content">
-                        <!-- Section 1: Report Information -->
-                        <div class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">📋 REPORT INFORMATION</h3>
-                            </div>
-                            <div class="pdf-info-box pdf-space-y-2">
-                                <p class="pdf-text-sm"><span class="pdf-info-label">Report Date:</span> ${data.reportDate || 'N/A'}</p>
-                                <p class="pdf-text-sm"><span class="pdf-info-label">Property Address:</span> ${data.propertyAddress || 'N/A'}</p>
-                                <p class="pdf-text-sm"><span class="pdf-info-label">Technician:</span> ${data.technicianName || 'N/A'}</p>
-                                <p class="pdf-text-sm"><span class="pdf-info-label">Service Date:</span> ${data.serviceDate || 'N/A'}</p>
-                                <p class="pdf-text-sm"><span class="pdf-info-label">Next Scheduled Maintenance:</span> ${data.nextMaintenance || 'N/A'}</p>
-                            </div>
-                        </div>
-
-                        <!-- Section 2: System Health Overview -->
-                        <div class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">📊 SYSTEM HEALTH OVERVIEW</h3>
-                            </div>
-                            <div class="pdf-space-y-3">
-                                <div class="pdf-flex-center pdf-flex-gap">
-                                    <span class="pdf-info-label pdf-text-sm">Overall System Status:</span>
-                                    <span class="${getStatusClass(data.systemStatus)}">${data.systemStatus || 'N/A'}</span>
-                                </div>
-                                <div class="pdf-flex-center pdf-flex-gap">
-                                    <span class="pdf-info-label pdf-text-sm">Network Connectivity:</span>
-                                    <span class="${getStatusClass(data.networkStatus)}">${data.networkStatus || 'N/A'}</span>
-                                </div>
-
-                                <div class="pdf-info-box pdf-space-y-2 pdf-mt-3">
-                                    <p class="pdf-text-sm"><span class="pdf-info-label">Total Cameras:</span> ${data.totalCameras || '0'}</p>
-                                    <p class="pdf-text-sm"><span class="pdf-info-label">Cameras Operational:</span> ${data.camerasOperational || '0'}</p>
-                                    <p class="pdf-text-sm"><span class="pdf-info-label">Cameras Requiring Attention:</span> ${data.camerasAttention || '0'}</p>
-                                </div>
-
-                                <div class="pdf-info-box pdf-space-y-2 pdf-mt-3">
-                                    <p class="pdf-text-sm"><span class="pdf-info-label">System Uptime:</span> ${data.uptime || '0'}%</p>
-                                    <p class="pdf-text-sm"><span class="pdf-info-label">Recording Storage Used:</span> ${data.storageUsed || '0'}%</p>
-                                    <p class="pdf-text-sm"><span class="pdf-info-label">Storage Days Remaining:</span> ${data.storageDays || '0'} days</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Section 3: Maintenance Activities -->
-                        <div class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">✅ MAINTENANCE ACTIVITIES COMPLETED</h3>
-                            </div>
-                            ${activities.length > 0 ? `
-                                <div class="pdf-activities-grid">
-                                    ${activities.map(activity => `
-                                        <div class="pdf-activity-item">
-                                            <div class="pdf-activity-checkmark">✓</div>
-                                            <span class="pdf-activity-text">${activity}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            ` : '<p class="pdf-no-data">No activities recorded</p>'}
-                        </div>
-
-                        <!-- Section 4: Individual Camera Status -->
-                        <div class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">📹 INDIVIDUAL CAMERA STATUS</h3>
-                            </div>
-                            ${camerasHTML}
-                        </div>
-
-                        <!-- Section 5: Issues Identified & Resolved -->
-                        <div class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">🔧 ISSUES IDENTIFIED & RESOLVED</h3>
-                            </div>
-                            ${issuesHTML}
-                        </div>
-
-                        <!-- Section 6: Recommendations -->
-                        <div class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">💡 RECOMMENDATIONS</h3>
-                            </div>
-                            ${data.maintenanceRec || data.upgradeOpp || data.optimizationSug ? `
-                                <div class="pdf-space-y-3">
-                                    ${data.maintenanceRec ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">Maintenance Recommendations:</p><p class="pdf-text-dark pdf-text-sm">${data.maintenanceRec}</p></div>` : ''}
-                                    ${data.upgradeOpp ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">Upgrade Opportunities:</p><p class="pdf-text-dark pdf-text-sm">${data.upgradeOpp}</p></div>` : ''}
-                                    ${data.optimizationSug ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">System Optimization:</p><p class="pdf-text-dark pdf-text-sm">${data.optimizationSug}</p></div>` : ''}
-                                    ${data.estimatedCost || data.priorityLevel ? `
-                                        <div class="pdf-info-box pdf-space-y-2 pdf-mt-3">
-                                            ${data.estimatedCost ? `<p class="pdf-text-sm"><span class="pdf-info-label">Estimated Cost:</span> ${data.estimatedCost}</p>` : ''}
-                                            ${data.priorityLevel ? `<p class="pdf-text-sm"><span class="pdf-info-label">Priority Level:</span> ${data.priorityLevel}</p>` : ''}
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            ` : '<p class="pdf-no-data">No recommendations at this time</p>'}
-                        </div>
-
-                        <!-- Section 7: Storage & Recording -->
-                        <div class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">💾 STORAGE & RECORDING DETAILS</h3>
-                            </div>
-                            <div class="pdf-info-box pdf-space-y-2 pdf-mb-3">
-                                <p class="pdf-text-sm"><span class="pdf-info-label">Total Storage Capacity:</span> ${data.storageCapacity || 'N/A'}</p>
-                                <p class="pdf-text-sm"><span class="pdf-info-label">Current Storage Used:</span> ${data.storageCurrentlyUsed || 'N/A'}</p>
-                                <p class="pdf-text-sm"><span class="pdf-info-label">Recording Retention Period:</span> ${data.retentionPeriod || '0'} days</p>
-                                <p class="pdf-text-sm"><span class="pdf-info-label">Video Quality Settings:</span> ${data.videoQuality || 'N/A'}</p>
-                            </div>
-                            <div class="pdf-flex-center pdf-flex-gap">
-                                <span class="pdf-info-label pdf-text-sm">Backup Status:</span>
-                                <span class="${getStatusClass(data.backupStatus)}">${data.backupStatus || 'N/A'}</span>
-                            </div>
-                        </div>
-
-                        <!-- Section 8: System Updates -->
-                        <div class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">🔄 SYSTEM UPDATES</h3>
-                            </div>
-                            ${data.firmwareVersion || data.softwareVersion || data.updatesApplied || data.updatesRecommended ? `
-                                <div class="pdf-space-y-3">
-                                    ${data.firmwareVersion || data.softwareVersion ? `
-                                        <div class="pdf-info-box pdf-space-y-2">
-                                            ${data.firmwareVersion ? `<p class="pdf-text-sm"><span class="pdf-info-label">Current Firmware Version:</span> ${data.firmwareVersion}</p>` : ''}
-                                            ${data.softwareVersion ? `<p class="pdf-text-sm"><span class="pdf-info-label">Current Software Version:</span> ${data.softwareVersion}</p>` : ''}
-                                        </div>
-                                    ` : ''}
-                                    ${data.updatesApplied ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">Updates Applied This Month:</p><p class="pdf-text-dark pdf-text-sm">${data.updatesApplied}</p></div>` : ''}
-                                    ${data.updatesRecommended ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">Updates Recommended:</p><p class="pdf-text-dark pdf-text-sm">${data.updatesRecommended}</p></div>` : ''}
-                                </div>
-                            ` : '<p class="pdf-no-data">No updates information available</p>'}
-                        </div>
-
-                        <!-- Section 9: Summary -->
-                        <div class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">📝 SUMMARY</h3>
-                            </div>
-                            <div class="pdf-space-y-3">
-                                <div>
-                                    <p class="pdf-info-label pdf-text-sm pdf-mb-1">Overall Assessment:</p>
-                                    <p class="pdf-text-dark pdf-text-sm">${data.overallAssessment || 'N/A'}</p>
-                                </div>
-                                ${data.criticalItems ? `
-                                    <div class="pdf-critical-box">
-                                        <p class="pdf-critical-title pdf-mb-2">⚠ CRITICAL ITEMS REQUIRING IMMEDIATE ATTENTION:</p>
-                                        <p class="pdf-text-dark pdf-text-sm">${data.criticalItems}</p>
-                                    </div>
-                                ` : ''}
-                                ${data.focusAreas ? `
-                                    <div>
-                                        <p class="pdf-info-label pdf-text-sm pdf-mb-1">Next Month Focus Areas:</p>
-                                        <p class="pdf-text-dark pdf-text-sm">${data.focusAreas}</p>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-
-                        <!-- Section 10: Sign-off -->
-                        <div class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">✍️ SIGN-OFF</h3>
-                            </div>
-                            <div class="pdf-signoff-box pdf-space-y-3">
-                                <p class="pdf-text-sm"><span class="pdf-info-label">Technician Signature:</span> <span class="pdf-signoff-value">${data.techSignature || 'N/A'}</span></p>
-                                ${data.clientAck ? `<p class="pdf-text-sm"><span class="pdf-info-label">Client Acknowledgment:</span> ${data.clientAck}</p>` : ''}
-                                ${data.clientFeedback ? `<div><p class="pdf-info-label pdf-text-sm pdf-mb-1">Client Feedback:</p><p class="pdf-text-dark pdf-text-sm">${data.clientFeedback}</p></div>` : ''}
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" name="part_${partCount}_quantity" min="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="part_${partCount}_status">
+                            <option value="Used">Used</option>
+                            <option value="Required">Required</option>
+                        </select>
                     </div>
                 </div>
             `;
-        }
-    </script>
-</body>
+				container.appendChild(partDiv);
+				updateProgress();
+			}
+
+			// Remove Part
+			function removePart(id) {
+				const element = document.getElementById(`part-${id}`);
+				if (element) {
+					element.remove();
+					updateProgress();
+				}
+			}
+
+			// Update Progress
+			function updateProgress() {
+				const form = document.getElementById("maintenanceForm");
+				const requiredFields = form.querySelectorAll("[required]");
+				let filledCount = 0;
+
+				requiredFields.forEach((field) => {
+					if (field.type === "checkbox") {
+						// For checkboxes, check if any in the group are checked
+						const checkboxes = form.querySelectorAll(
+							'[name="' + field.name + '"]',
+						);
+						const anyChecked = Array.from(checkboxes).some(
+							(cb) => cb.checked,
+						);
+						if (anyChecked) filledCount++;
+					} else if (field.value.trim() !== "") {
+						filledCount++;
+					}
+				});
+
+				const percentage = Math.round(
+					(filledCount / requiredFields.length) * 100,
+				);
+				document.getElementById("progressFill").style.width =
+					percentage + "%";
+				document.getElementById("progressText").textContent =
+					percentage + "%";
+			}
+
+			// Save Form Data
+			function saveFormData() {
+				try {
+					const formData = getFormData();
+					localStorage.setItem(
+						"reportData",
+						JSON.stringify(formData),
+					);
+					localStorage.setItem("lastSaved", new Date().toISOString());
+					updateLastSavedDisplay();
+					showSaveIndicator();
+					console.log("Form data saved successfully");
+					alert("Progress saved successfully!");
+				} catch (error) {
+					console.error("Error saving form data:", error);
+					alert("Error saving progress: " + error.message);
+				}
+			}
+
+			// Auto-save
+			function autoSave() {
+				saveFormData();
+			}
+
+			// Get Form Data
+			function getFormData() {
+				const form = document.getElementById("maintenanceForm");
+				const formData = new FormData(form);
+				const data = {};
+
+				// Get all form elements
+				for (let [key, value] of formData.entries()) {
+					// Skip the individual month/year dropdowns, use combined hidden field
+					if (
+						key === "reportMonth_month" ||
+						key === "reportMonth_year"
+					) {
+						continue;
+					}
+					if (data[key]) {
+						// Handle multiple values (checkboxes)
+						if (Array.isArray(data[key])) {
+							data[key].push(value);
+						} else {
+							data[key] = [data[key], value];
+						}
+					} else {
+						data[key] = value;
+					}
+				}
+
+				// Ensure reportMonth is set from hidden field
+				const reportMonthHidden =
+					document.getElementById("reportMonth_hidden");
+				if (reportMonthHidden && reportMonthHidden.value) {
+					data.reportMonth = reportMonthHidden.value;
+				}
+
+				// Get all checkboxes (including unchecked)
+				const checkboxes = form.querySelectorAll(
+					'input[type="checkbox"]',
+				);
+				checkboxes.forEach((cb) => {
+					if (!data[cb.name]) {
+						data[cb.name] = [];
+					}
+				});
+
+				// Store counts for dynamic sections
+				data.cameraCount = cameraCount;
+				data.issueCount = issueCount;
+				data.partCount = partCount;
+
+				return data;
+			}
+
+			// Set Form Data
+			function setFormData(data) {
+				const form = document.getElementById("maintenanceForm");
+
+				// Restore camera and issue counts
+				if (data.cameraCount) {
+					for (let i = 1; i <= data.cameraCount; i++) {
+						if (data[`camera_${i}_location`] !== undefined) {
+							addCamera();
+						}
+					}
+				}
+
+				if (data.issueCount) {
+					for (let i = 1; i <= data.issueCount; i++) {
+						if (data[`issue_${i}_description`] !== undefined) {
+							addIssue();
+						}
+					}
+				}
+
+				if (data.partCount) {
+					for (let i = 1; i <= data.partCount; i++) {
+						if (data[`part_${i}_description`] !== undefined) {
+							addPart();
+						}
+					}
+				}
+
+				// Handle reportMonth specially - split into month/year dropdowns
+				if (data.reportMonth) {
+					const [year, month] = data.reportMonth.split("-");
+					const monthSelect =
+						document.getElementById("reportMonth_month");
+					const yearSelect =
+						document.getElementById("reportMonth_year");
+					const hiddenField =
+						document.getElementById("reportMonth_hidden");
+
+					if (monthSelect && month) monthSelect.value = month;
+					if (yearSelect && year) yearSelect.value = year;
+					if (hiddenField) hiddenField.value = data.reportMonth;
+				}
+
+				// Populate form fields
+				for (let key in data) {
+					// Skip reportMonth as we handled it above
+					if (key === "reportMonth") continue;
+
+					const element = form.querySelector(`[name="${key}"]`);
+					if (element) {
+						if (element.type === "checkbox") {
+							const checkboxes = form.querySelectorAll(
+								`[name="${key}"]`,
+							);
+							const values = Array.isArray(data[key])
+								? data[key]
+								: [data[key]];
+							checkboxes.forEach((cb) => {
+								cb.checked = values.includes(cb.value);
+							});
+						} else {
+							element.value = data[key];
+						}
+					}
+				}
+
+				updateProgress();
+			}
+
+			// Show Save Indicator
+			function showSaveIndicator() {
+				const indicator = document.getElementById("saveIndicator");
+				indicator.classList.add("show");
+				setTimeout(() => {
+					indicator.classList.remove("show");
+				}, 2000);
+			}
+
+			// Update Last Saved Display
+			function updateLastSavedDisplay() {
+				const lastSaved = localStorage.getItem("lastSaved");
+				if (lastSaved) {
+					const date = new Date(lastSaved);
+					const now = new Date();
+					const diff = Math.floor((now - date) / 1000); // seconds
+
+					let displayText;
+					if (diff < 60) {
+						displayText = "Just now";
+					} else if (diff < 3600) {
+						const minutes = Math.floor(diff / 60);
+						displayText = `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+					} else {
+						displayText = date.toLocaleString();
+					}
+
+					document.getElementById("lastSaved").textContent =
+						displayText;
+				}
+			}
+
+			// Update last saved display every minute
+			setInterval(updateLastSavedDisplay, 60000);
+
+			// Restore Session
+			function restoreSession() {
+				const savedData = localStorage.getItem("reportData");
+				if (savedData) {
+					const data = JSON.parse(savedData);
+					setFormData(data);
+					updateLastSavedDisplay();
+				}
+				closeRestoreModal();
+			}
+
+			// Close Restore Modal
+			function closeRestoreModal() {
+				document.getElementById("restoreModal").style.display = "none";
+				// Add initial camera and issue if starting fresh
+				if (cameraCount === 0) addCamera();
+				if (issueCount === 0) addIssue();
+			}
+
+			// Show Clear Confirmation
+			function showClearConfirmation() {
+				document.getElementById("clearModal").style.display = "block";
+			}
+
+			// Close Clear Modal
+			function closeClearModal() {
+				document.getElementById("clearModal").style.display = "none";
+			}
+
+			// Clear Form
+			function clearForm() {
+				if (
+					confirm(
+						"Are you absolutely sure? This will delete all data permanently.",
+					)
+				) {
+					document.getElementById("maintenanceForm").reset();
+					localStorage.removeItem("reportData");
+					localStorage.removeItem("lastSaved");
+
+					// Clear dynamic sections
+					document.getElementById("camerasContainer").innerHTML = "";
+					document.getElementById("issuesContainer").innerHTML = "";
+					cameraCount = 0;
+					issueCount = 0;
+
+					// Add initial items
+					addCamera();
+					addIssue();
+
+					// Reset displays
+					document.getElementById("lastSaved").textContent = "Never";
+					updateProgress();
+					closeClearModal();
+				}
+			}
+
+			// Validate Form
+			function validateForm() {
+				const form = document.getElementById("maintenanceForm");
+				const requiredFields = form.querySelectorAll("[required]");
+				let isValid = true;
+
+				requiredFields.forEach((field) => {
+					if (!field.value.trim()) {
+						field.classList.add("error");
+						isValid = false;
+					} else {
+						field.classList.remove("error");
+					}
+				});
+
+				if (!isValid) {
+					alert("Please fill in all required fields (marked with *)");
+					// Scroll to first error
+					const firstError = form.querySelector(".error");
+					if (firstError) {
+						firstError.scrollIntoView({
+							behavior: "smooth",
+							block: "center",
+						});
+					}
+				}
+
+				return isValid;
+			}
+
+			// Generate PDF - High Density Table-Based Layout
+			// Calculate service hours
+			function calculateServiceHours(timeIn, timeOut) {
+				if (!timeIn || !timeOut) return "N/A";
+				const [inHour, inMin] = timeIn.split(":").map(Number);
+				const [outHour, outMin] = timeOut.split(":").map(Number);
+				const inMinutes = inHour * 60 + inMin;
+				const outMinutes = outHour * 60 + outMin;
+				const diff = outMinutes - inMinutes;
+				if (diff < 0) return "N/A";
+				const hours = Math.floor(diff / 60);
+				const mins = diff % 60;
+				return `${hours}h ${mins}m`;
+			}
+
+			function generatePDF() {
+				if (!validateForm()) {
+					return;
+				}
+
+				// Show loading indicator
+				const btn = document.querySelector(".btn-primary");
+				const originalText = btn.innerHTML;
+				btn.innerHTML = 'Generating PDF<span class="spinner"></span>';
+				btn.disabled = true;
+
+				try {
+					const { jsPDF } = window.jspdf;
+					const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+					const formData = getFormData();
+					let yPos = 8;
+					const pageHeight = 297;
+					const pageWidth = 210;
+					const margin = 8;
+					const contentWidth = pageWidth - 2 * margin;
+
+					// Smaller font sizes for high density
+					const FONT = {
+						TITLE: 14,
+						SECTION: 8,
+						HEADER: 7,
+						BODY: 6.5,
+						SMALL: 6,
+					};
+
+					// Colors
+					const COLORS = {
+						fenceGreen: [9, 51, 44],
+						norfolkGreen: [46, 75, 60],
+						fieryGlow: [240, 83, 28],
+						pumpkinVapor: [255, 167, 79],
+						venetianLace: [247, 237, 218],
+						macadamiaBeige: [247, 223, 186],
+						darkGray: [51, 51, 51],
+						lightGray: [240, 240, 240],
+						white: [255, 255, 255],
+						success: [40, 167, 69],
+						danger: [220, 53, 69],
+					};
+
+					// Helper: Check page break
+					function checkPage(needed) {
+						if (yPos + needed > pageHeight - 10) {
+							doc.addPage();
+							yPos = 8;
+							return true;
+						}
+						return false;
+					}
+
+					// Helper: Draw table row with text wrapping
+					function drawTableRow(
+						cols,
+						colWidths,
+						isHeader = false,
+						bgColor = null,
+					) {
+						const x = margin;
+
+						// Text setup
+						doc.setFontSize(isHeader ? FONT.HEADER : FONT.BODY);
+						doc.setFont(undefined, isHeader ? "bold" : "normal");
+						doc.setTextColor(
+							...(isHeader ? COLORS.white : COLORS.darkGray),
+						);
+
+						// Calculate max height needed for this row
+						let maxLines = 1;
+						const wrappedCells = [];
+						cols.forEach((text, i) => {
+							const cellText = String(text || "");
+							const wrapped = doc.splitTextToSize(
+								cellText,
+								colWidths[i] - 2,
+							);
+							wrappedCells.push(wrapped);
+							maxLines = Math.max(maxLines, wrapped.length);
+						});
+
+						const rowHeight = isHeader
+							? 5
+							: Math.max(4, maxLines * 2 + 2);
+
+						// Background
+						if (bgColor) {
+							doc.setFillColor(...bgColor);
+							doc.rect(x, yPos, contentWidth, rowHeight, "F");
+						}
+
+						// Draw text in each cell
+						let currentX = x + 1;
+						wrappedCells.forEach((lines, i) => {
+							doc.text(
+								lines,
+								currentX,
+								yPos + (isHeader ? 3.5 : 2.5),
+							);
+							currentX += colWidths[i];
+						});
+
+						// Border
+						doc.setDrawColor(200, 200, 200);
+						doc.setLineWidth(0.1);
+						doc.rect(x, yPos, contentWidth, rowHeight, "S");
+
+						yPos += rowHeight;
+					}
+
+					// Helper: Section header
+					function addSection(title) {
+						checkPage(8);
+						doc.setFillColor(...COLORS.fenceGreen);
+						doc.rect(margin, yPos, contentWidth, 5, "F");
+						doc.setFontSize(FONT.SECTION);
+						doc.setFont(undefined, "bold");
+						doc.setTextColor(...COLORS.white);
+						doc.text(title, margin + 2, yPos + 3.5);
+						yPos += 5;
+					}
+
+					// Helper: Key-value pair inline
+					function addKV(label, value, x, y, labelWidth = 25) {
+						doc.setFontSize(FONT.BODY);
+						doc.setFont(undefined, "bold");
+						doc.setTextColor(...COLORS.norfolkGreen);
+						doc.text(label + ":", x, y);
+						doc.setFont(undefined, "normal");
+						doc.setTextColor(...COLORS.darkGray);
+						doc.text(String(value || "N/A"), x + labelWidth, y);
+					}
+
+					// Helper: Status badge
+					function addBadge(status, x, y) {
+						const statusColors = {
+							Excellent: COLORS.success,
+							Good: COLORS.norfolkGreen,
+							Operational: COLORS.success,
+							Stable: COLORS.norfolkGreen,
+							"Needs Attention": COLORS.pumpkinVapor,
+							Intermittent: COLORS.pumpkinVapor,
+							Critical: COLORS.danger,
+							Offline: COLORS.danger,
+						};
+						const color = statusColors[status] || COLORS.lightGray;
+						const text = status || "N/A";
+						const width = doc.getTextWidth(text) + 3;
+
+						doc.setFillColor(...color);
+						doc.roundedRect(x, y - 2.5, width, 3.5, 0.5, 0.5, "F");
+						doc.setFontSize(FONT.SMALL);
+						doc.setFont(undefined, "bold");
+						doc.setTextColor(...COLORS.white);
+						doc.text(text, x + 1.5, y);
+					}
+
+					// ========== HEADER ==========
+					// Compact header bar
+					doc.setFillColor(...COLORS.fenceGreen);
+					doc.rect(0, 0, pageWidth, 18, "F");
+
+					// Add logo (if available)
+					try {
+						const logoImg = document.getElementById("logo-img");
+						console.log("Logo element:", logoImg);
+						console.log(
+							"Logo complete:",
+							logoImg ? logoImg.complete : "null",
+						);
+						console.log(
+							"Logo naturalWidth:",
+							logoImg ? logoImg.naturalWidth : "null",
+						);
+
+						if (
+							logoImg &&
+							logoImg.complete &&
+							logoImg.naturalWidth > 0
+						) {
+							console.log("Adding logo to PDF");
+							// Logo on the left side
+							const logoHeight = 14;
+							const logoWidth = 14;
+							doc.addImage(
+								logoImg,
+								"PNG",
+								margin,
+								2,
+								logoWidth,
+								logoHeight,
+							);
+
+							// Text next to logo
+							doc.setTextColor(...COLORS.white);
+							doc.setFontSize(FONT.TITLE);
+							doc.setFont(undefined, "bold");
+							doc.text("ZONEBRITE SOLUTIONS", margin + 16, 8);
+							doc.setFontSize(FONT.SMALL);
+							doc.setFont(undefined, "italic");
+							doc.text(
+								"Protecting What Matters Most",
+								margin + 16,
+								12,
+							);
+						} else {
+							console.log("Logo not loaded, using fallback text");
+							// Fallback if logo not loaded
+							doc.setTextColor(...COLORS.white);
+							doc.setFontSize(FONT.TITLE);
+							doc.setFont(undefined, "bold");
+							doc.text("ZONEBRITE SOLUTIONS", margin, 8);
+							doc.setFontSize(FONT.SMALL);
+							doc.setFont(undefined, "italic");
+							doc.text(
+								"Protecting What Matters Most",
+								margin,
+								12,
+							);
+						}
+					} catch (error) {
+						console.error("Error adding logo:", error);
+						// Fallback text
+						doc.setTextColor(...COLORS.white);
+						doc.setFontSize(FONT.TITLE);
+						doc.setFont(undefined, "bold");
+						doc.text("ZONEBRITE SOLUTIONS", margin, 8);
+						doc.setFontSize(FONT.SMALL);
+						doc.setFont(undefined, "italic");
+						doc.text("Protecting What Matters Most", margin, 12);
+					}
+
+					// Report info on right
+					doc.setFontSize(FONT.HEADER);
+					doc.setFont(undefined, "bold");
+					doc.text(
+						"MONTHLY MAINTENANCE REPORT",
+						pageWidth - margin,
+						6,
+						{ align: "right" },
+					);
+
+					let reportPeriod = "N/A";
+					if (formData.reportMonth) {
+						console.log("Raw reportMonth:", formData.reportMonth);
+						const [year, month] = formData.reportMonth.split("-");
+						console.log("Parsed year:", year, "month:", month);
+						const date = new Date(
+							parseInt(year),
+							parseInt(month) - 1,
+							1,
+						);
+						console.log("Created date:", date);
+						reportPeriod = date.toLocaleDateString("en-US", {
+							month: "long",
+							year: "numeric",
+						});
+						console.log("Final reportPeriod:", reportPeriod);
+					}
+					doc.setFont(undefined, "normal");
+					doc.setFontSize(FONT.BODY);
+					doc.text(
+						`Report #: ${formData.reportNumber || "N/A"}`,
+						pageWidth - margin,
+						10,
+						{ align: "right" },
+					);
+					doc.text(
+						`Type: ${formData.serviceType || "N/A"}`,
+						pageWidth - margin,
+						14,
+						{ align: "right" },
+					);
+
+					yPos = 22;
+
+					// ========== TICKET INFO BOX ==========
+					// Similar to the ticket system in image 1
+					doc.setFillColor(...COLORS.venetianLace);
+					doc.rect(margin, yPos, contentWidth, 20, "F");
+					doc.setDrawColor(...COLORS.fenceGreen);
+					doc.setLineWidth(0.3);
+					doc.rect(margin, yPos, contentWidth, 20, "S");
+
+					// Left column
+					addKV(
+						"Client",
+						formData.clientName,
+						margin + 2,
+						yPos + 4,
+						18,
+					);
+					addKV(
+						"Address",
+						formData.propertyAddress,
+						margin + 2,
+						yPos + 8,
+						18,
+					);
+					addKV(
+						"Contact",
+						formData.contactPerson || "N/A",
+						margin + 2,
+						yPos + 12,
+						18,
+					);
+					addKV(
+						"Technician",
+						formData.technicianName,
+						margin + 2,
+						yPos + 16,
+						18,
+					);
+
+					// Middle column
+					const midCol = margin + 70;
+					addKV(
+						"Service Date",
+						formData.serviceDate,
+						midCol,
+						yPos + 4,
+						18,
+					);
+					addKV("Report Period", reportPeriod, midCol, yPos + 8, 18);
+					addKV(
+						"Time In",
+						formData.timeIn || "N/A",
+						midCol,
+						yPos + 12,
+						18,
+					);
+					addKV(
+						"Time Out",
+						formData.timeOut || "N/A",
+						midCol,
+						yPos + 16,
+						18,
+					);
+
+					// Right column
+					const rightCol = margin + 135;
+					const serviceHours =
+						formData.timeIn && formData.timeOut
+							? calculateServiceHours(
+									formData.timeIn,
+									formData.timeOut,
+								)
+							: "N/A";
+					addKV(
+						"Service Hours",
+						serviceHours,
+						rightCol,
+						yPos + 4,
+						20,
+					);
+
+					yPos += 22;
+
+					// ========== SYSTEM HEALTH OVERVIEW ==========
+					addSection("SYSTEM HEALTH OVERVIEW");
+
+					// System Type and Status row
+					const statusY = yPos + 3;
+					doc.setFontSize(FONT.BODY);
+					doc.setFont(undefined, "bold");
+					doc.setTextColor(...COLORS.norfolkGreen);
+					doc.text("Type:", margin + 2, statusY);
+					doc.setFont(undefined, "normal");
+					doc.setTextColor(...COLORS.darkGray);
+					doc.text(
+						formData.systemType || "N/A",
+						margin + 10,
+						statusY,
+					);
+
+					doc.setFont(undefined, "bold");
+					doc.setTextColor(...COLORS.darkGray);
+					doc.text("System:", margin + 35, statusY);
+					addBadge(formData.systemStatus, margin + 49, statusY);
+
+					doc.text("Network:", margin + 80, statusY);
+					addBadge(formData.networkStatus, margin + 96, statusY);
+
+					doc.text("Backup:", margin + 127, statusY);
+					addBadge(formData.backupStatus, margin + 142, statusY);
+
+					yPos += 6;
+
+					// Metrics table
+					const metricsColWidths = [48.5, 48.5, 48.5, 48.5];
+					drawTableRow(
+						["Cameras", "Storage", "Uptime", "Retention"],
+						metricsColWidths,
+						true,
+						COLORS.norfolkGreen,
+					);
+					drawTableRow(
+						[
+							`${formData.camerasOperational || 0}/${formData.totalCameras || 0} operational`,
+							`${formData.storageUsed || 0}% used`,
+							`${formData.uptime || 0}%`,
+							`${formData.storageDays || 0} days`,
+						],
+						metricsColWidths,
+						false,
+						COLORS.lightGray,
+					);
+
+					yPos += 2;
+
+					// ========== MAINTENANCE ACTIVITIES ==========
+					addSection("MAINTENANCE ACTIVITIES COMPLETED");
+
+					yPos += 2; // Add spacing after section heading
+
+					const activities = formData.activities
+						? Array.isArray(formData.activities)
+							? formData.activities
+							: [formData.activities]
+						: [];
+					if (activities.length > 0) {
+						// Multi-column activity list
+						const colWidth = contentWidth / 2;
+						let col = 0;
+						let rowY = yPos;
+
+						activities.forEach((activity, i) => {
+							const x = margin + col * colWidth + 2;
+							doc.setFontSize(FONT.BODY);
+							doc.setFont(undefined, "normal");
+							doc.setTextColor(...COLORS.darkGray);
+
+							// Checkbox with checkmark
+							const boxSize = 2.5;
+							const boxX = x;
+							const boxY = rowY;
+
+							// Draw checkbox background
+							doc.setFillColor(...COLORS.success);
+							doc.roundedRect(
+								boxX,
+								boxY,
+								boxSize,
+								boxSize,
+								0.3,
+								0.3,
+								"F",
+							);
+
+							// Draw checkmark using lines
+							doc.setDrawColor(...COLORS.white);
+							doc.setLineWidth(0.4);
+							// Checkmark short line (bottom left to middle)
+							doc.line(
+								boxX + 0.6,
+								boxY + 1.3,
+								boxX + 1,
+								boxY + 1.8,
+							);
+							// Checkmark long line (middle to top right)
+							doc.line(
+								boxX + 1,
+								boxY + 1.8,
+								boxX + 2,
+								boxY + 0.6,
+							);
+
+							// Activity text
+							doc.setFontSize(FONT.BODY);
+							doc.setTextColor(...COLORS.darkGray);
+							doc.text(activity, x + boxSize + 1.5, rowY + 2, {
+								maxWidth: colWidth - 6,
+							});
+
+							col++;
+							if (col >= 2) {
+								col = 0;
+								rowY += 4;
+							}
+						});
+						yPos = rowY + (col > 0 ? 4 : 0) + 2;
+					} else {
+						doc.setFontSize(FONT.BODY);
+						doc.setTextColor(150, 150, 150);
+						doc.text(
+							"No activities recorded",
+							margin + 2,
+							yPos + 3,
+						);
+						yPos += 5;
+					}
+
+					// ========== CAMERA STATUS TABLE ==========
+					addSection("INDIVIDUAL CAMERA STATUS");
+
+					// Table header - added Image Quality column
+					const cameraColWidths = [35, 22, 18, 55, 64];
+					drawTableRow(
+						[
+							"Location",
+							"Status",
+							"Quality",
+							"Issues",
+							"Actions/Notes",
+						],
+						cameraColWidths,
+						true,
+						COLORS.norfolkGreen,
+					);
+
+					let hasCamera = false;
+					for (let i = 1; i <= formData.cameraCount; i++) {
+						const location = formData[`camera_${i}_location`];
+						if (location) {
+							hasCamera = true;
+							checkPage(5);
+							const status = formData[`camera_${i}_status`] || "";
+							const quality =
+								formData[`camera_${i}_quality`] || "-";
+							const issues =
+								formData[`camera_${i}_issues`] || "-";
+							const actions =
+								formData[`camera_${i}_actions`] || "";
+							const notes = formData[`camera_${i}_notes`] || "";
+							const actionsNotes =
+								[actions, notes].filter((x) => x).join(" | ") ||
+								"-";
+
+							drawTableRow(
+								[
+									location,
+									status,
+									quality,
+									issues,
+									actionsNotes,
+								],
+								cameraColWidths,
+								false,
+								i % 2 === 0 ? COLORS.lightGray : null,
+							);
+						}
+					}
+					if (!hasCamera) {
+						doc.setFontSize(FONT.BODY);
+						doc.setTextColor(150, 150, 150);
+						doc.text("No cameras recorded", margin + 2, yPos + 3);
+						yPos += 5;
+					}
+
+					yPos += 2;
+
+					// ========== ISSUES TABLE ==========
+					addSection("ISSUES IDENTIFIED & RESOLVED");
+
+					const issueColWidths = [20, 74, 60, 40];
+					drawTableRow(
+						["Severity", "Description", "Resolution", "Parts"],
+						issueColWidths,
+						true,
+						COLORS.pumpkinVapor,
+					);
+
+					let hasIssue = false;
+					for (let i = 1; i <= formData.issueCount; i++) {
+						const description = formData[`issue_${i}_description`];
+						if (description) {
+							hasIssue = true;
+							checkPage(5);
+							const severity =
+								formData[`issue_${i}_severity`] || "-";
+							const resolution =
+								formData[`issue_${i}_resolution`] || "-";
+							const parts = formData[`issue_${i}_parts`] || "-";
+
+							drawTableRow(
+								[severity, description, resolution, parts],
+								issueColWidths,
+								false,
+								i % 2 === 0 ? COLORS.lightGray : null,
+							);
+						}
+					}
+					if (!hasIssue) {
+						doc.setFontSize(FONT.BODY);
+						doc.setTextColor(150, 150, 150);
+						doc.text("No issues recorded", margin + 2, yPos + 3);
+						yPos += 5;
+					}
+
+					yPos += 2;
+
+					// ========== PARTS USED / REQUIRED ==========
+					let hasParts = false;
+					for (let i = 1; i <= formData.partCount; i++) {
+						if (formData[`part_${i}_description`]) {
+							hasParts = true;
+							break;
+						}
+					}
+
+					if (hasParts) {
+						addSection("PARTS USED / REQUIRED");
+
+						const partColWidths = [100, 30, 64];
+						drawTableRow(
+							["Part Description", "Qty", "Status"],
+							partColWidths,
+							true,
+							COLORS.norfolkGreen,
+						);
+
+						for (let i = 1; i <= formData.partCount; i++) {
+							const description =
+								formData[`part_${i}_description`];
+							if (description) {
+								checkPage(5);
+								const quantity =
+									formData[`part_${i}_quantity`] || "1";
+								const status =
+									formData[`part_${i}_status`] || "Used";
+
+								drawTableRow(
+									[description, quantity, status],
+									partColWidths,
+									false,
+									i % 2 === 0 ? COLORS.lightGray : null,
+								);
+							}
+						}
+
+						yPos += 2;
+					}
+
+					// ========== RECOMMENDATIONS ==========
+					if (
+						formData.maintenanceRec ||
+						formData.upgradeOpp ||
+						formData.optimizationSug
+					) {
+						addSection("RECOMMENDATIONS");
+
+						const recColWidths = [45, 50, 50, 49];
+						drawTableRow(
+							[
+								"Maintenance",
+								"Upgrades",
+								"Optimization",
+								"Est. Cost / Priority",
+							],
+							recColWidths,
+							true,
+							COLORS.fieryGlow,
+						);
+						drawTableRow(
+							[
+								formData.maintenanceRec || "-",
+								formData.upgradeOpp || "-",
+								formData.optimizationSug || "-",
+								`${formData.estimatedCost || "-"} / ${formData.priorityLevel || "-"}`,
+							],
+							recColWidths,
+							false,
+							COLORS.lightGray,
+						);
+
+						yPos += 2;
+					}
+
+					// ========== STORAGE & SYSTEM INFO ==========
+					addSection("STORAGE & SYSTEM DETAILS");
+
+					const sysColWidths = [48.5, 48.5, 48.5, 48.5];
+					drawTableRow(
+						[
+							"Storage Capacity",
+							"Currently Used",
+							"Video Quality",
+							"Firmware/Software",
+						],
+						sysColWidths,
+						true,
+						COLORS.norfolkGreen,
+					);
+					drawTableRow(
+						[
+							formData.storageCapacity || "N/A",
+							formData.storageCurrentlyUsed || "N/A",
+							formData.videoQuality || "N/A",
+							`${formData.firmwareVersion || "-"} / ${formData.softwareVersion || "-"}`,
+						],
+						sysColWidths,
+						false,
+						COLORS.lightGray,
+					);
+
+					// Updates info
+					if (
+						formData.updatesApplied ||
+						formData.updatesRecommended
+					) {
+						yPos += 1;
+						const updateColWidths = [97, 97];
+						drawTableRow(
+							["Updates Applied", "Updates Recommended"],
+							updateColWidths,
+							true,
+							COLORS.norfolkGreen,
+						);
+						drawTableRow(
+							[
+								formData.updatesApplied || "-",
+								formData.updatesRecommended || "-",
+							],
+							updateColWidths,
+							false,
+							COLORS.lightGray,
+						);
+					}
+
+					yPos += 2;
+
+					// ========== SUMMARY ==========
+					addSection("SUMMARY & ASSESSMENT");
+
+					// Overall assessment
+					doc.setFontSize(FONT.BODY);
+					doc.setFont(undefined, "bold");
+					doc.setTextColor(...COLORS.norfolkGreen);
+					doc.text("Overall Assessment:", margin + 2, yPos + 3);
+					doc.setFont(undefined, "normal");
+					doc.setTextColor(...COLORS.darkGray);
+
+					const assessmentText = doc.splitTextToSize(
+						formData.overallAssessment || "N/A",
+						contentWidth - 4,
+					);
+					const assessmentHeight = Math.max(
+						12,
+						assessmentText.length * 2 + 6,
+					);
+
+					doc.setFillColor(...COLORS.venetianLace);
+					doc.rect(margin, yPos, contentWidth, assessmentHeight, "F");
+
+					doc.text(assessmentText, margin + 2, yPos + 6);
+					yPos += assessmentHeight + 1;
+
+					// Critical items (highlighted)
+					if (formData.criticalItems) {
+						// Draw warning triangle icon
+						const iconX = margin + 2.5;
+						const iconY = yPos + 2.5;
+						const iconSize = 3.5;
+
+						// Text
+						doc.setFontSize(FONT.BODY);
+						doc.setFont(undefined, "bold");
+						doc.setTextColor(...COLORS.danger);
+						const critText = doc.splitTextToSize(
+							formData.criticalItems,
+							contentWidth - 30,
+						);
+						const critHeight = Math.max(8, critText.length * 2 + 6);
+
+						doc.setFillColor(254, 226, 226);
+						doc.setDrawColor(...COLORS.danger);
+						doc.setLineWidth(0.3);
+						doc.rect(margin, yPos, contentWidth, critHeight, "FD");
+
+						// Triangle outline (warning sign)
+						doc.setDrawColor(...COLORS.danger);
+						doc.setFillColor(254, 226, 226);
+						doc.setLineWidth(0.4);
+
+						// Draw triangle using three lines
+						const topX = iconX + iconSize / 2;
+						const topY = iconY;
+						const leftX = iconX;
+						const leftY = iconY + iconSize;
+						const rightX = iconX + iconSize;
+						const rightY = iconY + iconSize;
+
+						doc.triangle(
+							topX,
+							topY,
+							leftX,
+							leftY,
+							rightX,
+							rightY,
+							"S",
+						);
+
+						// Exclamation mark inside triangle
+						doc.setDrawColor(...COLORS.danger);
+						doc.setFillColor(...COLORS.danger);
+						doc.setLineWidth(0.5);
+						// Vertical line (exclamation)
+						const centerX = iconX + iconSize / 2;
+						doc.line(
+							centerX,
+							iconY + iconSize * 0.3,
+							centerX,
+							iconY + iconSize * 0.65,
+						);
+						// Dot
+						doc.circle(centerX, iconY + iconSize * 0.8, 0.25, "F");
+
+						doc.setFont(undefined, "bold");
+						doc.setTextColor(...COLORS.danger);
+						doc.text("CRITICAL:", margin + 8, yPos + 4);
+						doc.setFont(undefined, "normal");
+						doc.setTextColor(...COLORS.darkGray);
+						doc.text(critText, margin + 26, yPos + 4);
+						yPos += critHeight + 1;
+					}
+
+					// Focus areas
+					if (formData.focusAreas) {
+						doc.setFontSize(FONT.BODY);
+						doc.setFont(undefined, "bold");
+						doc.setTextColor(...COLORS.norfolkGreen);
+						doc.text("Next Month Focus:", margin + 2, yPos + 3);
+						doc.setFont(undefined, "normal");
+						doc.setTextColor(...COLORS.darkGray);
+						const focusText = doc.splitTextToSize(
+							formData.focusAreas,
+							contentWidth - 32,
+						);
+						doc.text(focusText, margin + 30, yPos + 3);
+						yPos += Math.max(5, focusText.length * 2 + 1);
+					}
+
+					// ========== SIGN-OFF ==========
+					yPos += 2;
+					doc.setDrawColor(...COLORS.fenceGreen);
+					doc.setLineWidth(0.5);
+					doc.line(margin, yPos, margin + contentWidth, yPos);
+					yPos += 3;
+
+					// Two-column sign-off
+					doc.setFontSize(FONT.BODY);
+					doc.setFont(undefined, "bold");
+					doc.setTextColor(...COLORS.fenceGreen);
+					doc.text("Technician:", margin + 2, yPos);
+					doc.setFont(undefined, "normal");
+					doc.text(
+						formData.techSignature || "N/A",
+						margin + 22,
+						yPos,
+					);
+
+					if (formData.clientAck) {
+						doc.setFont(undefined, "bold");
+						doc.text("Client:", margin + 100, yPos);
+						doc.setFont(undefined, "normal");
+						doc.text(formData.clientAck, margin + 115, yPos);
+					}
+
+					// Footer
+					yPos = pageHeight - 6;
+					doc.setFontSize(5);
+					doc.setTextColor(150, 150, 150);
+					doc.text(
+						"Zonebrite Solutions | info@zonebrite.com | www.zonebrite.com",
+						pageWidth / 2,
+						yPos,
+						{ align: "center" },
+					);
+
+					// Generate filename and save
+					const clientNameClean = (
+						formData.clientName || "Client"
+					).replace(/[^a-zA-Z0-9]/g, "");
+					let monthYear = "Report";
+					if (formData.reportMonth) {
+						const [year, month] = formData.reportMonth.split("-");
+						const date = new Date(year, month - 1, 1);
+						monthYear = date
+							.toLocaleDateString("en-US", {
+								month: "short",
+								year: "numeric",
+							})
+							.replace(" ", "");
+					}
+					const filename = `${clientNameClean}_MaintenanceReport_${monthYear}.pdf`;
+
+					// Save PDF
+					doc.save(filename);
+
+					btn.innerHTML = originalText;
+					btn.disabled = false;
+					alert("PDF generated successfully!");
+				} catch (error) {
+					console.error("Error generating PDF:", error);
+					alert("Error generating PDF: " + error.message);
+					btn.innerHTML = originalText;
+					btn.disabled = false;
+				}
+			}
+		</script>
+	</body>
 </html>
