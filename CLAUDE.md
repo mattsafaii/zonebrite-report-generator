@@ -10,10 +10,11 @@ Zonebrite Solutions Monthly Security System Maintenance Report Generator - a sin
 
 This is a simple static web application with no build process:
 
-- **maintenance-report-generator.html** - Main application file containing all HTML structure and JavaScript logic (~1745 lines)
+- **index.html** - Main application file containing all HTML structure and JavaScript logic (~1745 lines)
 - **styles.css** - All CSS styling including form styles and PDF-specific styles
 - **logo.png** - Zonebrite Solutions logo (used in PDF generation)
 - **zonebrite-logo.svg** - SVG version of the logo (alternative format)
+- **wrangler.toml** - Cloudflare Pages deployment configuration
 - No package.json or build tools - opens directly in browser
 
 ### Logo Handling
@@ -22,7 +23,7 @@ The logo is referenced via `<img id="logo-img" src="logo.png" style="display: no
 
 **Local Development Note**: Due to CORS restrictions, the logo image won't load when opening the HTML file directly with `file://` protocol. This is expected browser security behavior and doesn't affect functionality when the site is hosted on a web server (HTTP/HTTPS).
 
-### Key JavaScript Components (in maintenance-report-generator.html)
+### Key JavaScript Components (in index.html)
 
 - **Form Management**: Auto-save to localStorage every 30 seconds, session restore modal
 - **Dynamic Sections**: `addCamera()` and `addIssue()` functions for dynamic form entries
@@ -40,7 +41,7 @@ The logo is referenced via `<img id="logo-img" src="logo.png" style="display: no
 
 ## Development
 
-Simply open `maintenance-report-generator.html` in a browser. No server or build process required.
+Simply open `index.html` in a browser. No server or build process required.
 
 ### Testing Changes
 
